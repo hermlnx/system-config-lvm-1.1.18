@@ -1,0 +1,10 @@
+Author: Philipp Huebner <debalance@debian.org>
+Description: fix python path 
+--- a/src/system-config-lvm.py
++++ b/src/system-config-lvm.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python2
++#!/usr/bin/python
+ 
+ """Entry point for system-config-lvm.
+

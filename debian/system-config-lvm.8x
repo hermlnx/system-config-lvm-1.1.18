@@ -1,0 +1,32 @@
+.TH SYSTEM-CONFIG-LVM 8x "2010-02-03" "system-config-lvm"
+.SH NAME
+system-config-lvm \- GUI for LVM
+.SH SYNOPSIS
+.B system-config-lvm
+.SH DESCRIPTION
+system-config-lvm provides a graphical interface to the LVM tools (and related
+utilities, including fsck and resize2fs) which is good for non-emergency
+storage administration.
+.PP
+It enables you to manage your logical volume and filesystem configuration with
+a few mouse clicks, and it prevents potentially disastrous mistakes using
+commandline such as reducing a logical volume size before reducing the
+filesystem contained within that volume.
+.PP
+WARNING:
+.br
+system-config-lvm does not recognize RAID elements as
+being in use, and therefore lists them as "Unitnitialized Entities". If you are
+using a LVM-on-RAID configuration, system-config-lvm will let you wipe out RAID
+elements by making them into PVs, so be careful about that.
+.PP
+system-config-lvm does exactly what you tell it to do, so watch your click and
+think about it twice before acting.
+.PP
+.SH AUTHOR
+system-config-lvm was written by Jim Parsons <jparsons@redhat.com>.
+.PP
+This manual page was written by Philipp Huebner <debalance@debian.org>,
+for the Debian project (but may be used by others).
+.SH SEE ALSO
+.B lvm(8)

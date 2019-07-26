@@ -1,0 +1,26 @@
+>From 6523aa880e4e6f2bc1b1e2f22a59b9f0c5fd62a1 Mon Sep 17 00:00:00 2001
+From: hermlnx <hbeval1@gmail.com>
+Date: Wed, 3 Aug 2016 23:49:35 -0400
+Subject: [PATCH] Change readlink location to /bin/readlink as it is no longer present in /usr/bin (closes LP:#1325450)
+Bug-Debian: https://bugs.debian.org/833490
+
+---
+ src/utilities.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/utilities.py b/src/utilities.py
+index 454d476..0c5e69c 100644
+--- a/src/utilities.py
++++ b/src/utilities.py
+@@ -12,7 +12,7 @@ def follow_links_to_target(path, paths=[]):
+         return None
+     
+     if path not in cache_readlink_s:
+-      o, s = execWithCaptureStatus('/usr/bin/readlink', ['/usr/bin/readlink', '-e', path])
++      o, s = execWithCaptureStatus('/bin/readlink', ['/bin/readlink', '-e', path])
+       cache_readlink_o[path] = o
+       cache_readlink_s[path] = s
+     else:
+-- 
+2.7.4
+

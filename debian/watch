@@ -1,0 +1,2 @@
+version=3
+http://git.fedorahosted.org/cgit/system-config-lvm.git /cgit/system-config-lvm.git/snapshot/system-config-lvm-([0-9.]+)\.tar\.gz

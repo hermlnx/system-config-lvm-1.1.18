@@ -1,0 +1,2 @@
+# Allow this symlink for intltool's Makefile
+source-contains-unsafe-symlink po/Makefile.in.in

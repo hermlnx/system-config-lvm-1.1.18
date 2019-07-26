@@ -1,0 +1,198 @@
+system-config-lvm (1.1.18-3ubuntu1) zesty; urgency=medium
+
+  * Merge from Debian unstable.  Remaining changes:
+    - In Ubuntu, we use udev rather than an init script to activate lvm2, so
+      don't try to invoke the init script.
+
+ -- Bhavani Shankar <bhavi@ubuntu.com>  Tue, 03 Jan 2017 09:08:06 +0530
+
+system-config-lvm (1.1.18-3) unstable; urgency=medium
+
+  * Updated debian/copyright
+  * Converted debian/copyright into machine-readable format
+  * Added patch to address changed readlink location
+    (Closes: #833490; LP: #1325450)
+  * Updated Standards-Version: 3.9.8 (no changes needed)
+  * Updated Vcs-* fields in debian/control
+  * Added lintian-override for symlink to intltool's Makefile
+  * Added Keywords to desktop file
+
+ -- Philipp Huebner <debalance@debian.org>  Mon, 08 Aug 2016 11:33:03 +0200
+
+system-config-lvm (1.1.18-2ubuntu1) xenial; urgency=low
+
+  * Merge from Debian unstable.  Remaining changes:
+    - In Ubuntu, we use udev rather than an init script to activate lvm2, so
+      don't try to invoke the init script.
+
+ -- Bhavani Shankar <bhavi@ubuntu.com>  Sun, 29 Nov 2015 18:39:01 -0500
+
+system-config-lvm (1.1.18-2) unstable; urgency=low
+
+  * Updated Standards-Version: 3.9.6 (no changes needed)
+  * Updated years in debian/copyright
+  * Added Vcs links to debian/control
+  * Add patches for upstream commits after latest release
+  * Corrected a typo in the package description (Closes: #773028)
+    Thanks Tapio Laine for reporting!
+  * Switch from python-support to dh_python2
+
+ -- Philipp Huebner <debalance@debian.org>  Sun, 26 Apr 2015 13:53:03 +0200
+
+system-config-lvm (1.1.18-1ubuntu1) trusty; urgency=medium
+
+  * Reintroduce a version of my previous patch (thanks, Anton¡o Sch¡fano and
+    others):
+    - In Ubuntu, we use udev rather than an init script to activate lvm2, so
+      don't try to invoke the init script (LP: #1239912).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Wed, 16 Apr 2014 11:52:56 +0100
+
+system-config-lvm (1.1.18-1) unstable; urgency=low
+
+  * New upstream release (Closes: #588415)
+  * Updated debian/copyright
+  * Fixed "su-to-root" calls in startup script
+  * Removed changelog from Fedora SRPM because packaging now uses snapshots
+    from http://git.fedorahosted.org/cgit/system-config-lvm.git
+  * Updated debian/watch
+  * Removed wrongly used Vcs-fields from debian/control
+  * Updated Standards-Version: 3.9.4 (no changes needed) 
+  * Added upstream README file to installed documentation
+
+ -- Philipp Huebner <debalance@debian.org>  Mon, 11 Mar 2013 18:53:40 +0100
+
+system-config-lvm (1.1.16-1) unstable; urgency=low
+
+  * New upstream release
+  * Adjusted years in debian/copyright
+  * Updated Standards-Version: 3.9.2 (no changes needed)
+
+ -- Philipp Huebner <debalance@debian.org>  Mon, 02 Jan 2012 18:08:56 +1100
+
+system-config-lvm (1.1.15-1) unstable; urgency=low
+
+  * New upstream release
+  * Updated Standards-Version: 3.9.1 (no changes needed) 
+
+ -- Philipp Huebner <debalance@debian.org>  Thu, 21 Oct 2010 16:24:25 +0200
+
+system-config-lvm (1.1.14-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Philipp Huebner <debalance@debian.org>  Sun, 20 Jun 2010 11:38:05 +0200
+
+system-config-lvm (1.1.12-2) unstable; urgency=low
+
+  * Added gawk to Build-Depends (Closes: #577295)
+
+ -- Philipp Huebner <debalance@debian.org>  Mon, 12 Apr 2010 16:53:05 +0200
+
+system-config-lvm (1.1.12-1) unstable; urgency=low
+
+  * New upstream release
+  * Dropped unnecessary Build-Depends on quilt
+  * Make sure config.{cache|status|log} are removed by clean target
+
+ -- Philipp Huebner <debalance@debian.org>  Sun, 21 Feb 2010 13:00:52 +0100
+
+system-config-lvm (1.1.11-2) unstable; urgency=low
+
+  * Switched to dpkg-source 3.0 (quilt) format
+  * Switched from dpatch to quilt
+  * Switched from debhelper 6 to debhelper 7
+  * Reworked all the patches, replaced parts of them through overrides in
+    debian/rules
+  * Updated Standards-Version: 3.8.4 (no changes needed)
+  * Updated copyright
+  * Improved watch file
+  * Added Vcs- fields to debian/control
+  * Reordered Depends in debian/control
+  * Improved manpage
+  * Removed README.Debian + README.source
+  * Updated debian/copyright
+
+ -- Philipp Huebner <debalance@debian.org>  Thu, 04 Feb 2010 17:44:11 +0100
+
+system-config-lvm (1.1.11-1) unstable; urgency=low
+
+  * New upstream release
+  * Added ${misc:Depends} to Depends
+  * Renewed changelog.dpatch
+
+ -- Philipp Huebner <debalance@debian.org>  Sat, 16 Jan 2010 10:39:00 +0000
+
+system-config-lvm (1.1.10-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Philipp Huebner <debalance@debian.org>  Thu, 08 Oct 2009 10:59:10 +0200
+
+system-config-lvm (1.1.9-1) unstable; urgency=low
+
+  * New upstream release
+    Closes: #533617 - "IndexError: list index out of range"
+    Thanks Toni Mueller for reporting
+    Closes: #543808 - "Cannot delete LVM snapshot"
+    Thanks Frank Lin PIAT for reporting
+  * Reworked debian2redhat.dpatch
+  * Updated changelog.dpatch
+  * Build-Depends-Indep: + intltool
+  * Updated Standards-Version: 3.8.3
+    Added README.source
+  * Updated README.Debian
+
+ -- Philipp Huebner <debalance@debian.org>  Fri, 04 Sep 2009 16:00:32 +0200
+
+system-config-lvm (1.1.4-5) unstable; urgency=low
+
+  * Added patch to correct typo in German translation (Closes: #532912)
+    Thanks Mika Pflüger for reporting
+  * Updated maintainer's mail address
+  * Updated Standards-Version: 3.8.2 (no changes needed)
+
+ -- Philipp Huebner <debalance@debian.org>  Thu, 09 Jul 2009 10:47:33 +0200
+
+system-config-lvm (1.1.4-4) unstable; urgency=low
+
+  * Removed creation of /usr/bin/system-config-lvm from redhat2debian.dpatch
+    and created debian/system-config-lvm.sh
+    - to write /usr/bin/system-config-lvm
+    - to use 'invoke-rc.d lvm2 start' instead of 'modprobe dm_mod'
+      (Closes: #519579)
+    - to use su-to-root only if not already executed as root
+      Thanks Wolf Wiegand for reporting (Closes: #522625)
+  * Updated Standards-Version: 3.8.1
+  * debian/control: replaced 'patch' with '$(DPATCH_STAMPFN)'
+
+ -- Philipp Huebner <debalance@arcor.de>  Tue, 14 Apr 2009 19:24:51 +0200
+
+system-config-lvm (1.1.4-3) unstable; urgency=low
+
+  * Added CommandError module to system-config-lvm.py via patch (Closes: 507751)
+    Thanks Jan Muszynski for reporting
+    Thanks Maximilian Gaß for sending the patch
+  * Corrected copyright, years and GPL version in debian/copyright
+  * Got working watch file
+    Thanks Cyril Brulebois
+  * Added modprobe dm_mod before running system-config-lvm.py
+  * Added README.Debian
+
+ -- Philipp Huebner <debalance@arcor.de>  Thu, 19 Feb 2009 21:49:39 +0100
+
+system-config-lvm (1.1.4-2) unstable; urgency=medium
+
+  * Updated Standards-Version: 3.8.0 
+  * Added watch file
+  * Removed encoding key in .desktop file
+  * Added python-glade2 as a dependency (Closes: #496149)
+
+ -- Philipp Huebner <debalance@arcor.de>  Sun, 29 Jun 2008 10:32:37 +0200
+
+system-config-lvm (1.1.4-1) unstable; urgency=low
+
+  * Initial release (Closes: #482878)
+
+ -- Philipp Huebner <debalance@arcor.de>  Tue, 27 May 2008 13:11:19 +0200
+
