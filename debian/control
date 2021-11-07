@@ -3,7 +3,7 @@ Section: admin
 Priority: extra
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 XSBC-Original-Maintainer: Philipp Huebner <debalance@debian.org>
-Build-Depends: debhelper (>= 7.0.50~), python2, dh-python2
+Build-Depends: debhelper (>= 7.0.50~), python2
 Build-Depends-Indep: autotools-dev, gawk, gettext (>= 0.17), intltool, libxml-parser-perl (>= 2.36), python2 (>= 2.2)
 Standards-Version: 3.9.8
 Homepage: http://www.redhat.com

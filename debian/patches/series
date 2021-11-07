@@ -7,3 +7,5 @@
 03_typo-translation.patch
 04_desktop-file.patch
 05_utilities-readlink-path.patch
+06_properties_renderer-html-escape.patch
+07-remove-gnome-use.patch

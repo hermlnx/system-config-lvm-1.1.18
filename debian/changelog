@@ -1,3 +1,9 @@
+system-config-lvm (1.1.18-3ubuntu4) focal; urgency=medium
+
+  * Remove dependancy on python-gnome2
+
+ -- hermlnx (Launchpad) <hbeval1@gmail.com>  Sun, 7 Nov 2021 18:08:06 -0400
+ 
 system-config-lvm (1.1.18-3ubuntu3) focal; urgency=medium
 
   * Add python2 dependency

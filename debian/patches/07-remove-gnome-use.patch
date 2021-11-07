@@ -1,0 +1,201 @@
+diff --git a/src/Filesystem.glade b/src/Filesystem.glade
+index ec05592..1968652 100644
+--- a/src/Filesystem.glade
++++ b/src/Filesystem.glade
+@@ -2,7 +2,6 @@
+ <!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
+ 
+ <glade-interface>
+-<requires lib="gnome"/>
+ 
+ <widget class="GtkDialog" id="new_gfs_props">
+   <property name="title" translatable="yes">Clustered GFS Properties</property>
+diff --git a/src/InputController.py b/src/InputController.py
+index 6f77627..4c5fc15 100644
+--- a/src/InputController.py
++++ b/src/InputController.py
+@@ -43,8 +43,8 @@ except RuntimeError, e:
+ """) % e
+     sys.exit(-1)
+                                                                                 
+-import gnome
+-import gnome.ui
++#import gnome
++#import gnome.ui
+ 
+ SIZE_COL = TYPE_COL
+ VOL_TYPE_COL = 3
+diff --git a/src/Properties_Renderer.py b/src/Properties_Renderer.py
+index af0095f..6a19183 100644
+--- a/src/Properties_Renderer.py
++++ b/src/Properties_Renderer.py
+@@ -30,8 +30,8 @@ except RuntimeError, e:
+ """) % e
+     sys.exit(-1)
+                                                                                 
+-import gnome
+-import gnome.ui
++#import gnome
++#import gnome.ui
+ 
+ LABEL_X = 325
+ LABEL_Y = 600
+diff --git a/src/Volume_Tab_View.py b/src/Volume_Tab_View.py
+index 3e176e1..e0f15e9 100644
+--- a/src/Volume_Tab_View.py
++++ b/src/Volume_Tab_View.py
+@@ -36,8 +36,8 @@ except RuntimeError, e:
+ """) % e
+     sys.exit(-1)
+ 
+-import gnome
+-import gnome.ui
++#import gnome
++#import gnome.ui
+ 
+ VOLUME_GROUPS=_("Volume Groups")
+ UNALLOCATED_VOLUMES=_("Unallocated Volumes")
+diff --git a/src/lv_edit_props.glade b/src/lv_edit_props.glade
+index 0c26958..0a62dfc 100644
+--- a/src/lv_edit_props.glade
++++ b/src/lv_edit_props.glade
+@@ -2,7 +2,6 @@
+ <!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
+ 
+ <glade-interface>
+-<requires lib="gnome"/>
+ 
+ <widget class="GtkDialog" id="dialog1">
+   <property name="title" translatable="yes">Create New Logical Volume (LV)</property>
+diff --git a/src/lvm_model.py b/src/lvm_model.py
+index 45c8b54..8ba3514 100644
+--- a/src/lvm_model.py
++++ b/src/lvm_model.py
+@@ -1083,4 +1083,4 @@ def lvm_conf_get_locking_type():
+       if words[1] == '=':
+         locking_type = int(words[2])
+         return locking_type
+-  return None
++  return 1  #Ubuntu focal defaults to 1
+diff --git a/src/lvui.glade b/src/lvui.glade
+index ae272a3..3c2a7cc 100644
+--- a/src/lvui.glade
++++ b/src/lvui.glade
+@@ -2,7 +2,6 @@
+ <!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
+ 
+ <glade-interface>
+-<requires lib="gnome"/>
+ 
+ <widget class="GtkWindow" id="window1">
+   <property name="visible">True</property>
+@@ -31,7 +30,8 @@
+ 	  <child>
+ 	    <widget class="GtkMenuItem" id="file1">
+ 	      <property name="visible">True</property>
+-	      <property name="stock_item">GNOMEUIINFO_MENU_FILE_TREE</property>
++	        <property name="label" translatable="yes">_File</property>
++		    <property name="use_underline">True</property>
+ 
+ 	      <child>
+ 		<widget class="GtkMenu" id="file1_menu">
+@@ -39,7 +39,8 @@
+ 		  <child>
+ 		    <widget class="GtkImageMenuItem" id="quit1">
+ 		      <property name="visible">True</property>
+-		      <property name="stock_item">GNOMEUIINFO_MENU_EXIT_ITEM</property>
++		      <property name="label" translatable="yes">_Exit</property>
++		      <property name="use_underline">True</property>
+ 		      <signal name="activate" handler="on_quit1_activate" last_modification_time="Mon, 01 Nov 2004 14:53:41 GMT"/>
+ 		    </widget>
+ 		  </child>
+@@ -84,7 +85,8 @@
+ 	  <child>
+ 	    <widget class="GtkMenuItem" id="view1">
+ 	      <property name="visible">True</property>
+-	      <property name="stock_item">GNOMEUIINFO_MENU_VIEW_TREE</property>
++	      <property name="label" translatable="yes">_View</property>
++		    <property name="use_underline">True</property>
+ 
+ 	      <child>
+ 		<widget class="GtkMenu" id="view1_menu">
+@@ -117,7 +119,8 @@
+ 	  <child>
+ 	    <widget class="GtkMenuItem" id="help1">
+ 	      <property name="visible">True</property>
+-	      <property name="stock_item">GNOMEUIINFO_MENU_HELP_TREE</property>
++	      <property name="label" translatable="yes">_Help</property>
++		  <property name="use_underline">True</property>
+ 
+ 	      <child>
+ 		<widget class="GtkMenu" id="help1_menu">
+@@ -125,7 +128,8 @@
+ 		  <child>
+ 		    <widget class="GtkImageMenuItem" id="about1">
+ 		      <property name="visible">True</property>
+-		      <property name="stock_item">GNOMEUIINFO_MENU_ABOUT_ITEM</property>
++		      <property name="label" translatable="yes">_About</property>
++		    <property name="use_underline">True</property>
+ 		      <signal name="activate" handler="on_about1_activate" last_modification_time="Mon, 01 Nov 2004 14:53:41 GMT"/>
+ 		    </widget>
+ 		  </child>
+diff --git a/src/migrate_extents.glade b/src/migrate_extents.glade
+index 816b4a2..5e3859d 100644
+--- a/src/migrate_extents.glade
++++ b/src/migrate_extents.glade
+@@ -2,7 +2,6 @@
+ <!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
+ 
+ <glade-interface>
+-<requires lib="gnome"/>
+ 
+ <widget class="GtkDialog" id="dialog1">
+   <property name="border_width">3</property>
+diff --git a/src/system-config-lvm.py b/src/system-config-lvm.py
+index cb0d3d6..868e1c7 100755
+--- a/src/system-config-lvm.py
++++ b/src/system-config-lvm.py
+@@ -47,11 +47,11 @@ from lvm_model import lvm_model, lvm_conf_get_locking_type
+ from Volume_Tab_View import Volume_Tab_View
+ from lvmui_constants import *
+ 
+-import gnome
+-import gnome.ui
++#import gnome
++#import gnome.ui
+ 
+-gnome.program_init (PROGNAME, VERSION)
+-gnome.app_version = VERSION
++#gnome.program_init (PROGNAME, VERSION)
++#gnome.app_version = VERSION
+ FORMALNAME=_("system-config-lvm")
+ ABOUT_VERSION=_("%s %s") % ('system-config-lvm',VERSION)
+ 
+@@ -113,22 +113,11 @@ class baselvm:
+     )
+                                                                                 
+   def on_about(self, *args):
+-        dialog = gnome.ui.About(
+-            ABOUT_VERSION,
+-            '', ### Don't specify version - already in ABOUT_VERSION
+-            _("Copyright (c) 2004 Red Hat, Inc. All rights reserved."),
+-            _("This software is licensed under the terms of the GPL."),
+-            [ 'Stanko Kupcevic (system-config-lvm) <kupcevic at redhat.com>',
+-              'Jim Parsons (system-config-lvm) <jparsons at redhat.com>',
+-              'Alasdair Kergon (LVM2 Maintainer) <agk at redhat.com>',
+-              'Heinz Mauelshagen (LVM Maintainer) <mauelshagen at redhat.com>',
+-              '',
+-              'Kevin Anderson (Project Leader) <kanderso at redhat.com>'],
+-            [ 'Paul Kennedy <pkennedy at redhat.com>',
+-              'John Ha <jha at redhat.com>'], # doc people
+-        ) ### end dialog
+-        dialog.set_title (FORMALNAME)
+-        dialog.show()
++       dialog = gtk.MessageDialog(None, 0,
++                                    gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
++                                    "This software is licensed under the terms of the GPL. Copyright (c) 2004 Red Hat, Inc. All rights reserved.")
++       dialog.run()
++       dialog.destroy()
+         
+   
+   def on_reload(self, *args):
