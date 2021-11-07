@@ -2,7 +2,6 @@
 <!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
 
 <glade-interface>
-<requires lib="gnome"/>
 
 <widget class="GtkWindow" id="window1">
   <property name="visible">True</property>
@@ -31,7 +30,8 @@
 	  <child>
 	    <widget class="GtkMenuItem" id="file1">
 	      <property name="visible">True</property>
-	      <property name="stock_item">GNOMEUIINFO_MENU_FILE_TREE</property>
+	        <property name="label" translatable="yes">_File</property>
+		    <property name="use_underline">True</property>
 
 	      <child>
 		<widget class="GtkMenu" id="file1_menu">
@@ -39,7 +39,8 @@
 		  <child>
 		    <widget class="GtkImageMenuItem" id="quit1">
 		      <property name="visible">True</property>
-		      <property name="stock_item">GNOMEUIINFO_MENU_EXIT_ITEM</property>
+		      <property name="label" translatable="yes">_Exit</property>
+		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="on_quit1_activate" last_modification_time="Mon, 01 Nov 2004 14:53:41 GMT"/>
 		    </widget>
 		  </child>
@@ -84,7 +85,8 @@
 	  <child>
 	    <widget class="GtkMenuItem" id="view1">
 	      <property name="visible">True</property>
-	      <property name="stock_item">GNOMEUIINFO_MENU_VIEW_TREE</property>
+	      <property name="label" translatable="yes">_View</property>
+		    <property name="use_underline">True</property>
 
 	      <child>
 		<widget class="GtkMenu" id="view1_menu">
@@ -117,7 +119,8 @@
 	  <child>
 	    <widget class="GtkMenuItem" id="help1">
 	      <property name="visible">True</property>
-	      <property name="stock_item">GNOMEUIINFO_MENU_HELP_TREE</property>
+	      <property name="label" translatable="yes">_Help</property>
+		  <property name="use_underline">True</property>
 
 	      <child>
 		<widget class="GtkMenu" id="help1_menu">
@@ -125,7 +128,8 @@
 		  <child>
 		    <widget class="GtkImageMenuItem" id="about1">
 		      <property name="visible">True</property>
-		      <property name="stock_item">GNOMEUIINFO_MENU_ABOUT_ITEM</property>
+		      <property name="label" translatable="yes">_About</property>
+		    <property name="use_underline">True</property>
 		      <signal name="activate" handler="on_about1_activate" last_modification_time="Mon, 01 Nov 2004 14:53:41 GMT"/>
 		    </widget>
 		  </child>

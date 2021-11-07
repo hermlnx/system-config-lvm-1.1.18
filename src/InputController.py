@@ -43,8 +43,8 @@ except RuntimeError, e:
 """) % e
     sys.exit(-1)
                                                                                 
-import gnome
-import gnome.ui
+#import gnome
+#import gnome.ui
 
 SIZE_COL = TYPE_COL
 VOL_TYPE_COL = 3

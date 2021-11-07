@@ -30,8 +30,8 @@ except RuntimeError, e:
 """) % e
     sys.exit(-1)
                                                                                 
-import gnome
-import gnome.ui
+#import gnome
+#import gnome.ui
 
 LABEL_X = 325
 LABEL_Y = 600

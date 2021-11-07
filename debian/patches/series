@@ -3,7 +3,6 @@
 0003-Resolves-rhbz-875148-crash-with-striped-segments-in-.patch
 0004-Resolves-rhbz-1029755-allow-online-extension-of-ext3.patch
 0005-Resolves-rhbz-953071-GUI-cannot-be-opened-on-some-OS.patch
-01_python-path.patch
 02_CommandError.patch
 03_typo-translation.patch
 04_desktop-file.patch

@@ -1,0 +1,59 @@
+From 2d9ba3594186dc4d53e7a9f2e9a67f66bf17863f Mon Sep 17 00:00:00 2001
+Message-Id: <2d9ba3594186dc4d53e7a9f2e9a67f66bf17863f.1564177879.git.hermlnx@users.noreply.github.com>
+From: hermlnx <hermlnx@users.noreply.github.com>
+Date: Fri, 26 Jul 2019 17:45:19 -0400
+Subject: [PATCH] Fix error on Bionic where lvm now returns less than sign
+
+---
+ src/Properties_Renderer.py | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/src/Properties_Renderer.py b/src/Properties_Renderer.py
+index 0abe579..af0095f 100644
+--- a/src/Properties_Renderer.py
++++ b/src/Properties_Renderer.py
+@@ -47,7 +47,13 @@ UNINITIALIZED_VOLUME_STR=_("Disk Entity")
+ PHYSICAL_VOLUMEGROUP_STR=_("Volume Group")
+ LOGICAL_VOLUMEGROUP_STR=_("Volume Group")
+ VOLUMEGROUP_STR=_("Volume Group")
+-                                                                                
++html_escape_table = {
++     "&": "&amp;",
++     '"': "&quot;",
++     "'": "&apos;",
++     ">": "&gt;",
++     "<": "&lt;",
++     }                                                                                
+ ##############################################################
+ 
+ class Properties_Renderer:
+@@ -149,7 +155,7 @@ class Properties_Renderer:
+       if i != 0:
+         stringbuf.append("\n")
+         
+-      stringbuf.append("<b>" + props_list[i] + "</b>")
++      stringbuf.append("<b>" + self.html_escape(props_list[i]) + "</b>")
+       if (type == PHYS_TYPE) or (type == VG_PHYS_TYPE) or (type == UNALLOCATED_TYPE):
+         stringbuf.append("<span foreground=\"#ED1C2A\">")  
+       elif (type == LOG_TYPE) or (type == VG_LOG_TYPE):
+@@ -159,7 +165,7 @@ class Properties_Renderer:
+       else:
+         stringbuf.append("<span foreground=\"#404040\">")  
+ 
+-      stringbuf.append(props_list[i+1])
++      stringbuf.append(self.html_escape(props_list[i+1]))
+       stringbuf.append("</span>")
+ 
+     text_str = "".join(stringbuf)
+@@ -196,3 +202,8 @@ class Properties_Renderer:
+   
+   def on_expose_event(self, widget, event):
+       self.do_render()
++
++
++  def html_escape(self,text):
++     text_str = "".join(html_escape_table.get(c,c) for c in text)
++     return text_str
+-- 
+2.17.1
+

@@ -36,8 +36,8 @@ except RuntimeError, e:
 """) % e
     sys.exit(-1)
 
-import gnome
-import gnome.ui
+#import gnome
+#import gnome.ui
 
 VOLUME_GROUPS=_("Volume Groups")
 UNALLOCATED_VOLUMES=_("Unallocated Volumes")

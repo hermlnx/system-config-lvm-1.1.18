@@ -3,8 +3,8 @@ Section: admin
 Priority: extra
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 XSBC-Original-Maintainer: Philipp Huebner <debalance@debian.org>
-Build-Depends: debhelper (>= 7.0.50~)
-Build-Depends-Indep: autotools-dev, gawk, gettext (>= 0.17), intltool, libxml-parser-perl (>= 2.36), python (>= 2.2)
+Build-Depends: debhelper (>= 7.0.50~), python2, dh-python2
+Build-Depends-Indep: autotools-dev, gawk, gettext (>= 0.17), intltool, libxml-parser-perl (>= 2.36), python2 (>= 2.2)
 Standards-Version: 3.9.8
 Homepage: http://www.redhat.com
 Vcs-Git: https://anonscm.debian.org/git/users/debalance/system-config-lvm.git
@@ -12,7 +12,7 @@ Vcs-Browser: https://anonscm.debian.org/git/users/debalance/system-config-lvm.gi
 
 Package: system-config-lvm
 Architecture: all
-Depends: ${python:Depends}, ${misc:Depends}, gettext (>= 0.17), gsfonts, lvm2, menu, python-glade2, python-gnome2, python-gtk2
+Depends: ${python2:Depends}, ${misc:Depends}, gettext (>= 0.17), gsfonts, lvm2, menu, python-glade2, python-gtk2
 Description: utility for graphically configuring Logical Volumes
  System-config-lvm provides a graphical interface to the LVM tools (and related
  utilities, including fsck and resize2fs) which is good for non-emergency

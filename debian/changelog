@@ -1,3 +1,9 @@
+system-config-lvm (1.1.18-3ubuntu3) focal; urgency=medium
+
+  * Add python2 dependency
+
+ -- hermlnx (Launchpad) <hbeval1@gmail.com>  Sat, 6 Nov 2021 18:08:06 -0400
+
 system-config-lvm (1.1.18-3ubuntu2) bionic; urgency=medium
 
   * Added patch to address HTML reserved characters returned by lvm commands in renderer

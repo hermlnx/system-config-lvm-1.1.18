@@ -47,11 +47,11 @@ from lvm_model import lvm_model, lvm_conf_get_locking_type
 from Volume_Tab_View import Volume_Tab_View
 from lvmui_constants import *
 
-import gnome
-import gnome.ui
+#import gnome
+#import gnome.ui
 
-gnome.program_init (PROGNAME, VERSION)
-gnome.app_version = VERSION
+#gnome.program_init (PROGNAME, VERSION)
+#gnome.app_version = VERSION
 FORMALNAME=_("system-config-lvm")
 ABOUT_VERSION=_("%s %s") % ('system-config-lvm',VERSION)
 
@@ -113,22 +113,11 @@ class baselvm:
     )
                                                                                 
   def on_about(self, *args):
-        dialog = gnome.ui.About(
-            ABOUT_VERSION,
-            '', ### Don't specify version - already in ABOUT_VERSION
-            _("Copyright (c) 2004 Red Hat, Inc. All rights reserved."),
-            _("This software is licensed under the terms of the GPL."),
-            [ 'Stanko Kupcevic (system-config-lvm) <kupcevic at redhat.com>',
-              'Jim Parsons (system-config-lvm) <jparsons at redhat.com>',
-              'Alasdair Kergon (LVM2 Maintainer) <agk at redhat.com>',
-              'Heinz Mauelshagen (LVM Maintainer) <mauelshagen at redhat.com>',
-              '',
-              'Kevin Anderson (Project Leader) <kanderso at redhat.com>'],
-            [ 'Paul Kennedy <pkennedy at redhat.com>',
-              'John Ha <jha at redhat.com>'], # doc people
-        ) ### end dialog
-        dialog.set_title (FORMALNAME)
-        dialog.show()
+       dialog = gtk.MessageDialog(None, 0,
+                                    gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+                                    "This software is licensed under the terms of the GPL. Copyright (c) 2004 Red Hat, Inc. All rights reserved.")
+       dialog.run()
+       dialog.destroy()
         
   
   def on_reload(self, *args):

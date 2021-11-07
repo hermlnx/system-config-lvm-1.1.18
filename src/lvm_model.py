@@ -1083,4 +1083,4 @@ def lvm_conf_get_locking_type():
       if words[1] == '=':
         locking_type = int(words[2])
         return locking_type
-  return None
+  return 1  #Ubuntu focal defaults to 1
