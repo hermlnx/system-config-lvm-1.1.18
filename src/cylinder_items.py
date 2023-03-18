@@ -473,7 +473,7 @@ class SingleCylinder:
         # height
         height = upper_label_dim[1] + cyl_dim[1] + lower_label_dim[1]
         if main_label_dim[1] > height:
-            height = mail_label_dim[1]
+            height = main_label_dim[1]
 
         return width, height, upper_label_dim[1]
     
