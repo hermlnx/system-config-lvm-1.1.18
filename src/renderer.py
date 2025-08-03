@@ -1,8 +1,10 @@
 
 
 import sys
-import pygtk
-import gtk, gtk.glade
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, Gdk
+from gi.repository import GObject
 
 
 
@@ -71,12 +73,14 @@ class DisplayView:
         self.dvH_selectable = False
         
         self.gc = self.da.window.new_gc()
-        white = gtk.gdk.colormap_get_system().alloc_color("white", 1,1)
-        black = gtk.gdk.colormap_get_system().alloc_color("black", 1,1)
+        # Note: Colormap allocation is handled differently in GTK3
+        # Using RGBA colors instead of gtk.gdk.colormap_get_system()
+        white = Gdk.RGBA(1.0, 1.0, 1.0, 1.0)  # white
+        black = Gdk.RGBA(0.0, 0.0, 0.0, 1.0)  # black
         self.gc.foreground = black
         self.gc.background = white
         
-        self.da.add_events(gtk.gdk.BUTTON_PRESS_MASK)
+        self.da.add_events(Gdk.EventMask.BUTTON_PRESS_MASK)
         self.da.connect('expose-event', self.expose)
         self.da.connect('button_press_event', self.mouse_event)
         
@@ -84,10 +88,11 @@ class DisplayView:
         
         self.display = None # Single or Double Cylinder
         
-        lv_color = gtk.gdk.colormap_get_system().alloc_color(GRADIENT_LV, 1,1)
-        pv_color = gtk.gdk.colormap_get_system().alloc_color(GRADIENT_PV, 1,1)
-        uv_color = gtk.gdk.colormap_get_system().alloc_color(GRADIENT_UV, 1,1)
-        vg_color = gtk.gdk.colormap_get_system().alloc_color(GRADIENT_VG, 1,1)
+        # Note: Using RGBA colors instead of colormap allocation
+        lv_color = Gdk.RGBA(); lv_color.parse(GRADIENT_LV)
+        pv_color = Gdk.RGBA(); pv_color.parse(GRADIENT_PV)
+        uv_color = Gdk.RGBA(); uv_color.parse(GRADIENT_UV)
+        vg_color = Gdk.RGBA(); vg_color.parse(GRADIENT_VG)
         self.pv_cyl_gen = CylinderGenerator(INSTALLDIR + '/pixmaps/PV.xpm', pv_color)
         self.lv_cyl_gen = CylinderGenerator(INSTALLDIR + '/pixmaps/LV.xpm', lv_color)
         self.uv_cyl_gen = CylinderGenerator(INSTALLDIR + '/pixmaps/UV.xpm', uv_color)
@@ -168,7 +173,8 @@ class DisplayView:
         
         return (True, False)
     
-    def set_visible_size(self, (width, height)):
+    def set_visible_size(self, size_tuple):
+        width, height = size_tuple
         self.visible_size = (width, height)
     def get_visible_size(self):
         return self.visible_size
@@ -476,7 +482,7 @@ class DisplayView:
                         cyl.children.append(Separator(1, self.lv_cyl_gen, 3))
                         cyl.children.append(image_lv_cyl)
                 else:
-                    print 'Error: render_vg(): invalid segment type'
+                    print('Error: render_vg(): invalid segment type')
             
             # set up mirroring log
             if lv.is_mirrored():
@@ -619,21 +625,21 @@ class DisplayView:
             pixmap.draw_layout(self.gc, 180, 180, layout)
         
     def mouse_event(self, obj, event, *args):
-        if event.type == gtk.gdk.BUTTON_PRESS:
+        if event.type == Gdk.EventType.BUTTON_PRESS:
             #	print 'single click'
             #       print 'button', event.button
             #	print 'time', event.time
             #	print 'x', event.x
             #	print 'y', event.y
             pass
-        elif event.type == gtk.gdk._2BUTTON_PRESS:
+        elif event.type == Gdk.EventType._2BUTTON_PRESS:
             #	print 'double click'
             #	print 'button', event.button
             #	print 'time', event.time
             #	print 'x', event.x
             #	print 'y', event.y
             pass
-        elif event.type == gtk.gdk._3BUTTON_PRESS:
+        elif event.type == Gdk.EventType._3BUTTON_PRESS:
             #	print 'triple click'
             #	print 'button', event.button
             #	print 'time', event.time
@@ -641,7 +647,7 @@ class DisplayView:
             #	print 'y', event.y
             pass
         else:
-            print 'unknown mouse event'
+            print('unknown mouse event')
         
         if self.display != None:
             self.display.click((int(event.x), int(event.y)), event.button==1)

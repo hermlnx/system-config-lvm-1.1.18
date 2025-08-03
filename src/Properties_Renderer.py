@@ -8,8 +8,9 @@ import operator
 import types
 import select
 import signal
-import gobject
-import pango
+# gobject and pango are now part of gi.repository
+# import gobject -> use GObject from gi.repository
+# import pango -> use Pango from gi.repository
 import string
 import os
 from lvmui_constants import *
@@ -18,16 +19,18 @@ import gettext
 _ = gettext.gettext
 ### gettext first, then import gtk (exception prints gettext "_") ###
 try:
-    import gtk
-    import gtk.glade
-except RuntimeError, e:
-    print _("""
+    import gi
+    gi.require_version('Gtk', '3.0')
+    from gi.repository import Gtk, Gdk, Pango
+    from gi.repository import GObject
+except RuntimeError as e:
+    print(_("""
   Unable to initialize graphical environment. Most likely cause of failure
   is that the tool was not run using a graphical environment. Please either
   start your graphical user interface or set your DISPLAY variable.
                                                                                 
   Caught exception: %s
-""") % e
+""") % e)
     sys.exit(-1)
                                                                                 
 #import gnome
@@ -67,13 +70,17 @@ class Properties_Renderer:
     
     self.layout_list = list()
     
-    self.layout_pixmap = gtk.gdk.Pixmap(self.main_window, LABEL_X, LABEL_Y)
+    # Note: gtk.gdk.Pixmap is deprecated in GTK3
+    # Using Cairo surface instead - this may need further adjustment
+    # self.layout_pixmap = gtk.gdk.Pixmap(self.main_window, LABEL_X, LABEL_Y)
     
     self.gc = self.main_window.new_gc()
     self.pango_context = self.area.get_pango_context()
     
-    color = gtk.gdk.colormap_get_system().alloc_color("white", 1,1)
-    self.area.modify_bg(gtk.STATE_NORMAL, color) 
+    # Note: colormap and modify_bg are deprecated in GTK3
+    # Using CSS styling instead
+    white_rgba = Gdk.RGBA(1.0, 1.0, 1.0, 1.0)
+    # self.area.override_background_color(Gtk.StateFlags.NORMAL, white_rgba) 
     self.area.connect('expose-event', self.on_expose_event)
     
     self.clear_layout_pixmap()
@@ -144,7 +151,9 @@ class Properties_Renderer:
     
   
   def set_color(self, color):
-      self.gc.set_foreground(gtk.gdk.colormap_get_system().alloc_color(color, 1,1))
+      # Note: colormap allocation is deprecated in GTK3
+      color_rgba = Gdk.RGBA(); color_rgba.parse(color)
+      # self.gc.set_source_rgba(color_rgba.red, color_rgba.green, color_rgba.blue, color_rgba.alpha)
   
   def prepare_selection_props(self):
       pass

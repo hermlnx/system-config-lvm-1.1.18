@@ -1,5 +1,7 @@
 
-import gtk
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, Gdk
 
 
 class WaitMsg:
@@ -9,15 +11,15 @@ class WaitMsg:
         self.msg = message
     
     def show(self):
-        self.dlg = gtk.MessageDialog(None, 0,
-                                     gtk.MESSAGE_INFO, gtk.BUTTONS_NONE, 
+        self.dlg = Gtk.MessageDialog(None, 0,
+                                     Gtk.MessageType.INFO, Gtk.ButtonsType.NONE, 
                                      self.msg)
         self.dlg.set_modal(True)
         self.dlg.show_now()
         self.displayed = True
         
         # change cursor
-        cursor = gtk.gdk.Cursor(gtk.gdk.WATCH)
+        cursor = Gdk.Cursor.new(Gdk.CursorType.WATCH)
         self.dlg.get_root_window().set_cursor(cursor)
         
         self.refresh()
@@ -30,11 +32,11 @@ class WaitMsg:
             self.displayed = False
             
             # revert cursor
-            cursor = gtk.gdk.Cursor(gtk.gdk.LEFT_PTR)
+            cursor = Gdk.Cursor.new(Gdk.CursorType.LEFT_PTR)
             self.dlg.get_root_window().set_cursor(cursor)
             
         self.refresh()
     
     def refresh(self):
-        while gtk.events_pending():
-            gtk.main_iteration(False)
+        while Gtk.events_pending():
+            Gtk.main_iteration()

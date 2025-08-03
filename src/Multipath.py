@@ -98,7 +98,7 @@ class Multipath:
                         if bd[1] == major and bd[2] == minor:
                             devices.append(bd[0])
             if len(devices) == 0:
-                print 'multipath error: ' + origin + str(devices)
+                print('multipath error: ' + origin + str(devices))
                 continue
             
             multipath_data[origin] = devices

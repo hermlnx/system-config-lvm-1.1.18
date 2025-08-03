@@ -1,6 +1,6 @@
 AC_INIT()
 AM_INIT_AUTOMAKE(system-config-lvm, 1.1.18)
-AM_PATH_PYTHON(2.3)
+AM_PATH_PYTHON(3.6)
 
 ALL_LINGUAS=`ls po/ | grep \\.po\$ | sed s/\\.po// | xargs`
 

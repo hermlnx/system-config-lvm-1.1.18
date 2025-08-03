@@ -132,7 +132,8 @@ class PhysicalVolume(Volume):
   def getMultipath(self):
     return self.multipath
   
-  def setPartition(self, (devname, part)):
+  def setPartition(self, partition_tuple):
+    devname, part = partition_tuple
     self.size = part.getSizeBytes()/1024.0/1024/1024
     self.part = part
     self.addDevname(devname)
@@ -161,9 +162,9 @@ class PhysicalVolume(Volume):
   
   
   def print_out(self, padding):
-    print padding + 'PV: ' + self.get_name() + ' paths: ' + str(self.get_paths()) + ' devices: ' + str(self.getDevnames()) + ' multipath ' + str(self.getMultipath())
-    print padding + 'extents:'
+    print(padding + 'PV: ' + self.get_name() + ' paths: ' + str(self.get_paths()) + ' devices: ' + str(self.getDevnames()) + ' multipath ' + str(self.getMultipath()))
+    print(padding + 'extents:')
     if len(self.get_extent_blocks()) == 0:
-      print padding + '  None'
+      print(padding + '  None')
     for extent in self.get_extent_blocks():
       extent.print_out(padding + '  ')

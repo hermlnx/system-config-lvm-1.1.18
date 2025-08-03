@@ -272,7 +272,7 @@ class CommandHandler:
                                                        _("Removing Logical Volume"))
       if res != 0:
         raise CommandError('FATAL', COMMAND_FAILURE % ("lvremove",cmdstr,err))
-    except CommandError, e:
+    except CommandError as e:
       self.activate_lv(lvpath)
       raise e
   

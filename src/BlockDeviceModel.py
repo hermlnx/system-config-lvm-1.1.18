@@ -98,7 +98,7 @@ class BlockDeviceModel:
     def printDevices(self):
         devs = self.getDevices()
         for dev in devs:
-            print 'device:', dev
+            print('device:', dev)
             for part in devs[dev]:
                 part.printout()
     

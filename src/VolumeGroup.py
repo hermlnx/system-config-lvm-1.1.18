@@ -45,13 +45,13 @@ class VolumeGroup(Volume):
   
   
   def print_out(self):
-    print 'VG: ' + self.get_name()
-    print self.get_extent_total_used_free()
-    print 'LVs:'
+    print('VG: ' + self.get_name())
+    print(self.get_extent_total_used_free())
+    print('LVs:')
     for lv in self.lvs.values():
       lv.print_out('  ')
-    print 'PVs'
+    print('PVs')
     for pv in self.pvs.values():
       pv.print_out('  ')
-    print ''
-    print ''
+    print('')
+    print('')

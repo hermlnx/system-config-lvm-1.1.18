@@ -12,8 +12,10 @@ import xml
 import xml.dom
 from xml.dom import minidom
 
-import gtk
-import gtk.glade
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+from gi.repository import GObject
 from lvmui_constants import PROGNAME, INSTALLDIR
 
 
@@ -569,7 +571,7 @@ class gfs(Filesystem):
             cmdstr = ' '.join(args)
             o,e,r = execWithCaptureErrorStatus('/sbin/gfs_tool', args)
             if r == 0:
-                for k,v in gfs_types.iteritems():
+                for k,v in gfs_types.items():
                     if k in o: 
                         return v
         return None
@@ -586,16 +588,19 @@ class gfs_clustered(Filesystem):
         gladepath = 'Filesystem.glade'
         if not os.path.exists(gladepath):
             gladepath = "%s/%s" % (INSTALLDIR, gladepath)
-        gtk.glade.bindtextdomain(PROGNAME)
-        self.glade_xml = gtk.glade.XML (gladepath, domain=PROGNAME)
-        self.dlg = self.glade_xml.get_widget('new_gfs_props')
+        # Note: gtk.glade.bindtextdomain and gtk.glade.XML are replaced with Gtk.Builder
+        # This will need to be updated when converting glade files to UI files
+        self.glade_xml = Gtk.Builder()
+        self.glade_xml.set_translation_domain(PROGNAME)
+        self.glade_xml.add_from_file(gladepath)
+        self.dlg = self.glade_xml.get_object('new_gfs_props')
         
-        self.clustername_entry  = self.glade_xml.get_widget('clustername')
-        self.gfsname_entry      = self.glade_xml.get_widget('gfsname')
-        self.journals_spin      = self.glade_xml.get_widget('journals')
-        self.lock_dlm_butt      = self.glade_xml.get_widget('lock_dlm')
-        self.lock_gulm_butt     = self.glade_xml.get_widget('lock_gulm')
-        self.locking_box        = self.glade_xml.get_widget('locking_box')
+        self.clustername_entry  = self.glade_xml.get_object('clustername')
+        self.gfsname_entry      = self.glade_xml.get_object('gfsname')
+        self.journals_spin      = self.glade_xml.get_object('journals')
+        self.lock_dlm_butt      = self.glade_xml.get_object('lock_dlm')
+        self.lock_gulm_butt     = self.glade_xml.get_object('lock_gulm')
+        self.locking_box        = self.glade_xml.get_object('locking_box')
         
         # populate new GFS form
         clustername = self.__get_cluster_name()
@@ -642,7 +647,7 @@ class gfs_clustered(Filesystem):
             valid = False
             while not valid:
                 rc = self.dlg.run()
-                if rc == gtk.RESPONSE_OK:
+                if rc == Gtk.ResponseType.OK:
                     valid = True
                     msg = ''
                     illegal_chars = ';:\'"/?.>,<]}[{ =+)(*&^%$#@!`~'
@@ -747,8 +752,8 @@ class gfs_clustered(Filesystem):
         return Cluster().running()
     
     def __errorMessage(self, message):
-        dlg = gtk.MessageDialog(None, 0,
-                                gtk.MESSAGE_ERROR, gtk.BUTTONS_OK,
+        dlg = Gtk.MessageDialog(None, 0,
+                                Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,
                                 message)
         dlg.show_all()
         rc = dlg.run()
@@ -764,7 +769,7 @@ class gfs_clustered(Filesystem):
             cmdstr = ' '.join(args)
             o,e,r = execWithCaptureErrorStatus('/sbin/gfs_tool', args)
             if r == 0:
-                for k,v in gfs_types.iteritems():
+                for k,v in gfs_types.items():
                     if k in o:
                         return v
         return None
@@ -910,7 +915,7 @@ class gfs2(Filesystem):
             cmdstr = ' '.join(args)
             o,e,r = execWithCaptureErrorStatus('/sbin/gfs_tool', args)
             if r == 0:
-                for k,v in gfs_types.iteritems():
+                for k,v in gfs_types.items():
                     if k in o: 
                         return v
         return None
@@ -927,16 +932,19 @@ class gfs2_clustered(Filesystem):
         gladepath = 'Filesystem.glade'
         if not os.path.exists(gladepath):
             gladepath = "%s/%s" % (INSTALLDIR, gladepath)
-        gtk.glade.bindtextdomain(PROGNAME)
-        self.glade_xml = gtk.glade.XML (gladepath, domain=PROGNAME)
-        self.dlg = self.glade_xml.get_widget('new_gfs_props')
+        # Note: gtk.glade.bindtextdomain and gtk.glade.XML are replaced with Gtk.Builder
+        # This will need to be updated when converting glade files to UI files
+        self.glade_xml = Gtk.Builder()
+        self.glade_xml.set_translation_domain(PROGNAME)
+        self.glade_xml.add_from_file(gladepath)
+        self.dlg = self.glade_xml.get_object('new_gfs_props')
         
-        self.clustername_entry  = self.glade_xml.get_widget('clustername')
-        self.gfsname_entry      = self.glade_xml.get_widget('gfsname')
-        self.journals_spin      = self.glade_xml.get_widget('journals')
-        self.lock_dlm_butt      = self.glade_xml.get_widget('lock_dlm')
-        self.lock_gulm_butt     = self.glade_xml.get_widget('lock_gulm')
-        self.locking_box        = self.glade_xml.get_widget('locking_box')
+        self.clustername_entry  = self.glade_xml.get_object('clustername')
+        self.gfsname_entry      = self.glade_xml.get_object('gfsname')
+        self.journals_spin      = self.glade_xml.get_object('journals')
+        self.lock_dlm_butt      = self.glade_xml.get_object('lock_dlm')
+        self.lock_gulm_butt     = self.glade_xml.get_object('lock_gulm')
+        self.locking_box        = self.glade_xml.get_object('locking_box')
         
         # populate new GFS form
         clustername = self.__get_cluster_name()
@@ -983,7 +991,7 @@ class gfs2_clustered(Filesystem):
             valid = False
             while not valid:
                 rc = self.dlg.run()
-                if rc == gtk.RESPONSE_OK:
+                if rc == Gtk.ResponseType.OK:
                     valid = True
                     msg = ''
                     illegal_chars = ';:\'"/?.>,<]}[{ =+)(*&^%$#@!`~'
@@ -1088,8 +1096,8 @@ class gfs2_clustered(Filesystem):
         return Cluster().running()
     
     def __errorMessage(self, message):
-        dlg = gtk.MessageDialog(None, 0,
-                                gtk.MESSAGE_ERROR, gtk.BUTTONS_OK,
+        dlg = Gtk.MessageDialog(None, 0,
+                                Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,
                                 message)
         dlg.show_all()
         rc = dlg.run()
@@ -1105,7 +1113,7 @@ class gfs2_clustered(Filesystem):
             cmdstr = ' '.join(args)
             o,e,r = execWithCaptureErrorStatus('/sbin/gfs_tool', args)
             if r == 0:
-                for k,v in gfs_types.iteritems():
+                for k,v in gfs_types.items():
                     if k in o:
                         return v
         return None

@@ -78,16 +78,16 @@ class LogicalVolume(Volume):
     return self.mirror_log
   
   def print_out(self, padding):
-    print padding + 'LV: ' + self.get_name() + ' ' + str(self.get_path()) + ' ' + str(self.get_extent_total_used_free()[1])
+    print(padding + 'LV: ' + self.get_name() + ' ' + str(self.get_path()) + ' ' + str(self.get_extent_total_used_free()[1]))
     if self.is_snapshot():
       info = self.get_snapshot_info()
-      print padding + 'snapshot origin(' + info[0].get_name() + ')'
+      print(padding + 'snapshot origin(' + info[0].get_name() + ')')
     if self.has_snapshots():
       snaps = self.get_snapshots()
       snaps_str = snaps[0].get_name()
       for snap in snaps:
         snaps_str = snaps_str + ', ' + snap.get_name()
-      print padding + 'snapshots: ' + snaps_str
-    print padding + 'segments:'
+      print(padding + 'snapshots: ' + snaps_str)
+    print(padding + 'segments:')
     for seg in self.segments:
       seg.print_out(padding + '  ')

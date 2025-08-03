@@ -8,7 +8,7 @@ import os
 import re
 import stat
 import os.path
-import gobject
+# gobject is now part of GObject from gi.repository
 import locale
 from lvm_model import lvm_model
 from CommandHandler import CommandHandler
@@ -31,16 +31,18 @@ _ = gettext.gettext
 
 ### gettext first, then import gtk (exception prints gettext "_") ###
 try:
-    import gtk
-    import gtk.glade
-except RuntimeError, e:
-    print _("""
+    import gi
+    gi.require_version('Gtk', '3.0')
+    from gi.repository import Gtk
+    from gi.repository import GObject
+except RuntimeError as e:
+    print(_("""
   Unable to initialize graphical environment. Most likely cause of failure
   is that the tool was not run using a graphical environment. Please either
   start your graphical user interface or set your DISPLAY variable.
                                                                                 
   Caught exception: %s
-""") % e
+""") % e)
     sys.exit(-1)
                                                                                 
 #import gnome
@@ -181,7 +183,7 @@ class InputController:
         self.command_handler.complete_pvmove()
   
   def setup_dialogs(self):
-    self.init_entity_button = self.glade_xml.get_widget('uninit_button')
+    self.init_entity_button = self.glade_xml.get_object('uninit_button')
     self.init_entity_button.connect("clicked", self.on_init_entity)
     
     self.setup_new_vg_form()
@@ -190,29 +192,29 @@ class InputController:
     
     ###################
     ##This form adds an unallocated PV to a VG
-    self.add_pv_to_vg_dlg = self.glade_xml.get_widget('add_pv_to_vg_form')
+    self.add_pv_to_vg_dlg = self.glade_xml.get_object('add_pv_to_vg_form')
     self.add_pv_to_vg_dlg.connect("delete_event",self.add_pv_to_vg_delete_event)
-    self.add_pv_to_vg_button = self.glade_xml.get_widget('add_pv_to_vg_button')
+    self.add_pv_to_vg_button = self.glade_xml.get_object('add_pv_to_vg_button')
     self.add_pv_to_vg_button.connect("clicked",self.on_add_pv_to_vg)
-    self.add_pv_to_vg_treeview = self.glade_xml.get_widget('add_pv_to_vg_treeview')
-    self.ok_add_pv_to_vg_button = self.glade_xml.get_widget('ok_add_pv_to_vg_button')
+    self.add_pv_to_vg_treeview = self.glade_xml.get_object('add_pv_to_vg_treeview')
+    self.ok_add_pv_to_vg_button = self.glade_xml.get_object('ok_add_pv_to_vg_button')
     self.ok_add_pv_to_vg_button.connect("clicked",self.on_ok_add_pv_to_vg)
-    self.cancel_add_pv_to_vg_button = self.glade_xml.get_widget('cancel_add_pv_to_vg_button')
+    self.cancel_add_pv_to_vg_button = self.glade_xml.get_object('cancel_add_pv_to_vg_button')
     self.cancel_add_pv_to_vg_button.connect("clicked",self.on_cancel_add_pv_to_vg)
-    self.add_pv_to_vg_label = self.glade_xml.get_widget('add_pv_to_vg_label')
-    model = gtk.ListStore (gobject.TYPE_STRING,
-                           gobject.TYPE_STRING)
+    self.add_pv_to_vg_label = self.glade_xml.get_object('add_pv_to_vg_label')
+    model = Gtk.ListStore (GObject.TYPE_STRING,
+                           GObject.TYPE_STRING)
     self.add_pv_to_vg_treeview.set_model(model)
-    renderer1 = gtk.CellRendererText()
-    column1 = gtk.TreeViewColumn("Volume Groups",renderer1, text=0)
+    renderer1 = Gtk.CellRendererText()
+    column1 = Gtk.TreeViewColumn("Volume Groups",renderer1, text=0)
     self.add_pv_to_vg_treeview.append_column(column1)
-    renderer2 = gtk.CellRendererText()
-    column2 = gtk.TreeViewColumn("Size",renderer2, text=1)
+    renderer2 = Gtk.CellRendererText()
+    column2 = Gtk.TreeViewColumn("Size",renderer2, text=1)
     self.add_pv_to_vg_treeview.append_column(column2)
     self.add_pv_to_vg_treeview.get_selection().connect("changed", self.vg_selection_on_change)
     
     # new lv button
-    self.new_lv_button = self.glade_xml.get_widget('new_lv_button')
+    self.new_lv_button = self.glade_xml.get_object('new_lv_button')
     self.new_lv_button.connect("clicked",self.on_new_lv)
     
     self.setup_extend_vg_form()
@@ -221,24 +223,24 @@ class InputController:
   ##################
   ##This form adds a new VG
   def setup_new_vg_form(self):
-    self.new_vg_dlg = self.glade_xml.get_widget('new_vg_form')
+    self.new_vg_dlg = self.glade_xml.get_object('new_vg_form')
     self.new_vg_dlg.connect("delete_event",self.new_vg_delete_event)
-    self.new_vg_button = self.glade_xml.get_widget('new_vg_button')
+    self.new_vg_button = self.glade_xml.get_object('new_vg_button')
     self.new_vg_button.connect("clicked", self.on_new_vg)
-    self.ok_new_vg_button = self.glade_xml.get_widget('ok_new_vg_button')
+    self.ok_new_vg_button = self.glade_xml.get_object('ok_new_vg_button')
     self.ok_new_vg_button.connect("clicked",self.ok_new_vg)
-    self.cancel_new_vg_button = self.glade_xml.get_widget('cancel_new_vg_button')
+    self.cancel_new_vg_button = self.glade_xml.get_object('cancel_new_vg_button')
     self.cancel_new_vg_button.connect("clicked", self.cancel_new_vg)
     
     ##Buttons and fields...
-    self.new_vg_name = self.glade_xml.get_widget('new_vg_name')
-    self.new_vg_max_pvs = self.glade_xml.get_widget('new_vg_max_pvs')
-    self.new_vg_max_lvs = self.glade_xml.get_widget('new_vg_max_lvs')
-    self.new_vg_extent_size = self.glade_xml.get_widget('new_vg_extent_size')
-    self.new_vg_radio_meg = self.glade_xml.get_widget('radiobutton1')
+    self.new_vg_name = self.glade_xml.get_object('new_vg_name')
+    self.new_vg_max_pvs = self.glade_xml.get_object('new_vg_max_pvs')
+    self.new_vg_max_lvs = self.glade_xml.get_object('new_vg_max_lvs')
+    self.new_vg_extent_size = self.glade_xml.get_object('new_vg_extent_size')
+    self.new_vg_radio_meg = self.glade_xml.get_object('radiobutton1')
     self.new_vg_radio_meg.connect('clicked', self.change_new_vg_radio)
-    self.new_vg_radio_kilo = self.glade_xml.get_widget('radiobutton2')
-    self.new_vg_clustered = self.glade_xml.get_widget('clustered_butt')
+    self.new_vg_radio_kilo = self.glade_xml.get_object('radiobutton2')
+    self.new_vg_clustered = self.glade_xml.get_object('clustered_butt')
 
   def on_new_vg(self, button):
     self.prep_new_vg_dlg()
@@ -316,7 +318,7 @@ class InputController:
                                            phys_extent_units_meg,
                                            pv.get_path(),
                                            clustered)
-    except CommandError, e:
+    except CommandError as e:
         self.errorMessage(e.getMessage())
     
     self.new_vg_dlg.hide()
@@ -426,20 +428,20 @@ class InputController:
         if solo_pv:
             #call vgremove
             retval = self.warningMessage(CONFIRM_VG_REMOVE % (pv.get_path(),vg.get_name()))
-            if (retval == gtk.RESPONSE_NO):
+            if (retval == Gtk.ResponseType.NO):
                 return False
             try:
                 self.command_handler.remove_vg(vg.get_name())
-            except CommandError, e:
+            except CommandError as e:
                 self.errorMessage(e.getMessage())
                 return False
         else: #solo_pv is False, more than one PV...
             retval = self.warningMessage(CONFIRM_PV_VG_REMOVE % (pv.get_path(),vg.get_name()))
-            if (retval == gtk.RESPONSE_NO):
+            if (retval == Gtk.ResponseType.NO):
                 return False
             try:
                 self.command_handler.reduce_vg(vg.get_name(), pv.get_path())
-            except CommandError, e:
+            except CommandError as e:
                 self.errorMessage(e.getMessage())
                 return False
     else:
@@ -455,7 +457,7 @@ class InputController:
                     self.errorMessage(NO_DM_MIRROR)
                     return False
                 retval = self.warningMessage(CONFIRM_PV_VG_REMOVE % (pv.get_path(),vg.get_name()))
-                if (retval == gtk.RESPONSE_NO):
+                if (retval == Gtk.ResponseType.NO):
                     return False
                 
                 # remove unused from extent_list
@@ -470,12 +472,12 @@ class InputController:
                     exts_structs.append(ext.get_start_size())
                 try:
                     self.command_handler.move_pv(pv.get_path(), exts_structs, dlg.get_data())
-                except CommandError, e:
+                except CommandError as e:
                     self.errorMessage(e.getMessage())
                     return True
                 try:
                     self.command_handler.reduce_vg(vg.get_name(), pv.get_path())
-                except CommandError, e:
+                except CommandError as e:
                     self.errorMessage(e.getMessage())
                     return True
                 
@@ -526,14 +528,14 @@ class InputController:
     else:
         message = CONFIRM_LV_REMOVE_MOUNTED % (lv.get_name(), mountpoint, lv.get_name())
     retval = self.warningMessage(message)
-    if retval == gtk.RESPONSE_NO:
+    if retval == Gtk.ResponseType.NO:
         return False
     
     # unmount and remove from fstab
     if mountpoint != None:
         try:
             self.command_handler.unmount(mountpoint)
-        except CommandError, e:
+        except CommandError as e:
             self.errorMessage(e.getMessage())
             return False
     if fstab_mountpoint != None:
@@ -542,7 +544,7 @@ class InputController:
     # finally remove lv
     try:
         self.command_handler.remove_lv(lv.get_path())
-    except CommandError, e:
+    except CommandError as e:
         self.errorMessage(e.getMessage())
         return False
     
@@ -668,13 +670,13 @@ class InputController:
   
   def on_init_entity_from_menu(self, obj, dlg=None):
       if dlg == None:
-          dlg = self.glade_xml.get_widget("init_block_device_dlg")
-      label = self.glade_xml.get_widget("init_block_device_dlg_path")
+          dlg = self.glade_xml.get_object("init_block_device_dlg")
+      label = self.glade_xml.get_object("init_block_device_dlg_path")
       label.select_region(0, (-1))
       label.grab_focus()
       rc = dlg.run()
       dlg.hide()
-      if rc == gtk.RESPONSE_APPLY:
+      if rc == Gtk.ResponseType.APPLY:
           path = label.get_text().strip()
           target = follow_links_to_target(path)
           if target == None:
@@ -690,14 +692,14 @@ class InputController:
                   return
           pv = PhysicalVolume.PhysicalVolume(path, None, None, 0, 0, False, 0, 0)
           pv.set_path(path)
-          self.glade_xml.get_widget("init_block_device_dlg_path").set_text('')
+          self.glade_xml.get_object("init_block_device_dlg_path").set_text('')
           if self.initialize_entity(pv) == None:
-              self.glade_xml.get_widget("init_block_device_dlg_path").set_text(path)
+              self.glade_xml.get_object("init_block_device_dlg_path").set_text(path)
               self.on_init_entity_from_menu(None, dlg)
           else:
               apply(self.reset_tree_model, ['', '', pv.get_path()])
       else:
-          self.glade_xml.get_widget("init_block_device_dlg_path").set_text('')
+          self.glade_xml.get_object("init_block_device_dlg_path").set_text('')
   
   def initialize_entity(self, pv):
       path = pv.get_path()
@@ -724,25 +726,25 @@ class InputController:
       else:
           message = INIT_ENTITY_MOUNTED % (path, mountPoint, path)
       rc = self.warningMessage(message)
-      if (rc == gtk.RESPONSE_NO):
+      if (rc == Gtk.ResponseType.NO):
           return None
       
       if mountPoint != None:
           try:
               self.command_handler.unmount(mountPoint)
-          except CommandError, e:
+          except CommandError as e:
               self.errorMessage(e.getMessage())
               return None
       
       if pv.needsFormat() and pv.wholeDevice():
-          dialog = self.glade_xml.get_widget('whole_device_format_choice')
-          label = self.glade_xml.get_widget('whole_device_format_choice_label')
+          dialog = self.glade_xml.get_object('whole_device_format_choice')
+          label = self.glade_xml.get_object('whole_device_format_choice_label')
           label.set_text(INIT_ENTITY_DEVICE_CHOICE % path) 
           rc = dialog.run()
           dialog.hide()
-          if rc == gtk.RESPONSE_YES:
+          if rc == Gtk.ResponseType.YES:
               doFormat = True
-          elif rc == gtk.RESPONSE_NO:
+          elif rc == Gtk.ResponseType.NO:
               doFormat = False
           else:
               return None
@@ -760,7 +762,7 @@ class InputController:
                   return None
               
           self.command_handler.initialize_entity(path)
-      except CommandError, e:
+      except CommandError as e:
           self.errorMessage(e.getMessage())
           return None
       return path
@@ -820,7 +822,7 @@ class InputController:
       
       try:
           self.command_handler.add_unalloc_to_vg(pv.get_path(), vgname)
-      except CommandError, e:
+      except CommandError as e:
           self.errorMessage(e.getMessage())
           return
       
@@ -835,33 +837,33 @@ class InputController:
   
   
   def setup_extend_vg_form(self):
-      self.on_extend_vg_button = self.glade_xml.get_widget('on_extend_vg_button')
+      self.on_extend_vg_button = self.glade_xml.get_object('on_extend_vg_button')
       self.on_extend_vg_button.connect("clicked",self.on_extend_vg)
-      self.extend_vg_form = self.glade_xml.get_widget('extend_vg_form')
+      self.extend_vg_form = self.glade_xml.get_object('extend_vg_form')
       self.extend_vg_form.connect("delete_event",self.extend_vg_delete_event)
-      self.extend_vg_tree = self.glade_xml.get_widget('extend_vg_tree')
-      self.extend_vg_label = self.glade_xml.get_widget('extend_vg_label')
-      self.glade_xml.get_widget('on_ok_extend_vg').connect('clicked', self.on_ok_extend_vg)
-      self.glade_xml.get_widget('on_cancel_extend_vg').connect('clicked',self.on_cancel_extend_vg)
+      self.extend_vg_tree = self.glade_xml.get_object('extend_vg_tree')
+      self.extend_vg_label = self.glade_xml.get_object('extend_vg_label')
+      self.glade_xml.get_object('on_ok_extend_vg').connect('clicked', self.on_ok_extend_vg)
+      self.glade_xml.get_object('on_cancel_extend_vg').connect('clicked',self.on_cancel_extend_vg)
       #set up columns for tree
-      model = gtk.ListStore (gobject.TYPE_STRING,
-                             gobject.TYPE_STRING,
-                             gobject.TYPE_STRING,
-                             gobject.TYPE_INT,
-                             gobject.TYPE_PYOBJECT)
+      model = Gtk.ListStore (GObject.TYPE_STRING,
+                             GObject.TYPE_STRING,
+                             GObject.TYPE_STRING,
+                             GObject.TYPE_INT,
+                             GObject.TYPE_PYOBJECT)
       
       self.extend_vg_tree.set_model(model)
-      renderer1 = gtk.CellRendererText()
-      column1 = gtk.TreeViewColumn(ENTITY_NAME,renderer1, text=0)
+      renderer1 = Gtk.CellRendererText()
+      column1 = Gtk.TreeViewColumn(ENTITY_NAME,renderer1, text=0)
       self.extend_vg_tree.append_column(column1)
-      renderer2 = gtk.CellRendererText()
-      column2 = gtk.TreeViewColumn(ENTITY_SIZE,renderer2, text=1)
+      renderer2 = Gtk.CellRendererText()
+      column2 = Gtk.TreeViewColumn(ENTITY_SIZE,renderer2, text=1)
       self.extend_vg_tree.append_column(column2)
-      renderer3 = gtk.CellRendererText()
-      column3 = gtk.TreeViewColumn(ENTITY_TYPE,renderer3, markup=2)
+      renderer3 = Gtk.CellRendererText()
+      column3 = Gtk.TreeViewColumn(ENTITY_TYPE,renderer3, markup=2)
       self.extend_vg_tree.append_column(column3)
       # set up multiselection
-      self.extend_vg_tree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+      self.extend_vg_tree.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
   
   def on_extend_vg(self, button):
       main_selection = self.treeview.get_selection()
@@ -907,7 +909,7 @@ class InputController:
                   continue
           try:
               self.command_handler.add_unalloc_to_vg(entity_path, vg.get_name())
-          except CommandError, e:
+          except CommandError as e:
               self.errorMessage(e.getMessage())
               continue
           reset_tree_model = True
@@ -961,25 +963,25 @@ class InputController:
     return True
   
   def setup_misc_widgets(self):
-      self.remove_unalloc_pv = self.glade_xml.get_widget('remove_unalloc_pv')
+      self.remove_unalloc_pv = self.glade_xml.get_object('remove_unalloc_pv')
       self.remove_unalloc_pv.connect("clicked",self.on_remove_unalloc_pv)
-      self.on_pv_rm_button = self.glade_xml.get_widget('on_pv_rm_button')
+      self.on_pv_rm_button = self.glade_xml.get_object('on_pv_rm_button')
       self.on_pv_rm_button.connect("clicked",self.on_pv_rm)
-      self.on_lv_rm_button = self.glade_xml.get_widget('on_lv_rm_button')
+      self.on_lv_rm_button = self.glade_xml.get_object('on_lv_rm_button')
       self.on_lv_rm_button.connect("clicked",self.on_lv_rm)
-      self.on_rm_select_lvs_button = self.glade_xml.get_widget('on_rm_select_lvs')
+      self.on_rm_select_lvs_button = self.glade_xml.get_object('on_rm_select_lvs')
       self.on_rm_select_lvs_button.connect("clicked",self.on_rm_select_lvs)
-      self.on_rm_select_pvs_button = self.glade_xml.get_widget('on_rm_select_pvs')
+      self.on_rm_select_pvs_button = self.glade_xml.get_object('on_rm_select_pvs')
       self.on_rm_select_pvs_button.connect("clicked",self.on_rm_select_pvs)
-      self.migrate_exts_button = self.glade_xml.get_widget('button27')
+      self.migrate_exts_button = self.glade_xml.get_object('button27')
       self.migrate_exts_button.connect("clicked",self.on_migrate_exts)
-      self.edit_lv_button = self.glade_xml.get_widget('button35')
+      self.edit_lv_button = self.glade_xml.get_object('button35')
       self.edit_lv_button.connect("clicked",self.on_edit_lv)
-      self.create_snapshot_button = self.glade_xml.get_widget('create_snapshot_button')
+      self.create_snapshot_button = self.glade_xml.get_object('create_snapshot_button')
       self.create_snapshot_button.connect("clicked",self.on_create_snapshot)
       
       # misc events
-      self.glade_xml.get_widget("initialize_block_device1").connect('activate', self.on_init_entity_from_menu)
+      self.glade_xml.get_object("initialize_block_device1").connect('activate', self.on_init_entity_from_menu)
       
   
   def on_remove_unalloc_pv(self, button):
@@ -987,12 +989,12 @@ class InputController:
       model, iter = selection.get_selected()
       pv = model.get_value(iter, OBJ_COL)
       retval = self.warningMessage(CONFIRM_PVREMOVE % pv.get_path())
-      if (retval == gtk.RESPONSE_NO):
+      if (retval == Gtk.ResponseType.NO):
           return
       else:
           try:
               self.command_handler.remove_pv(pv.get_path())
-          except CommandError, e:
+          except CommandError as e:
               self.errorMessage(e.getMessage())
               return
           apply(self.reset_tree_model, ['', '', pv.get_path()])
@@ -1020,7 +1022,7 @@ class InputController:
           exts_from_structs.append(ext.get_start_size())
       try:
           self.command_handler.move_pv(pv.get_path(), exts_from_structs, dlg.get_data())
-      except CommandError, e:
+      except CommandError as e:
           self.errorMessage(e.getMessage())
       apply(self.reset_tree_model, [pv.get_vg().get_name()])
       return
@@ -1099,28 +1101,28 @@ class InputController:
   ###Convenience Dialogs
   
   def warningMessage(self, message):
-      dlg = gtk.MessageDialog(None, 0,
-                              gtk.MESSAGE_WARNING,
-                              gtk.BUTTONS_YES_NO,
+      dlg = Gtk.MessageDialog(None, 0,
+                              Gtk.MessageType.WARNING,
+                              Gtk.ButtonsType.YES_NO,
                               message)
       dlg.show_all()
       rc = dlg.run()
       dlg.destroy()
-      if (rc == gtk.RESPONSE_NO):
-          return gtk.RESPONSE_NO
-      elif (rc == gtk.RESPONSE_DELETE_EVENT):
-          return gtk.RESPONSE_NO
-      elif (rc == gtk.RESPONSE_CLOSE):
-          return gtk.RESPONSE_NO
-      elif (rc == gtk.RESPONSE_CANCEL):
-          return gtk.RESPONSE_NO
+      if (rc == Gtk.ResponseType.NO):
+          return Gtk.ResponseType.NO
+      elif (rc == Gtk.ResponseType.DELETE_EVENT):
+          return Gtk.ResponseType.NO
+      elif (rc == Gtk.ResponseType.CLOSE):
+          return Gtk.ResponseType.NO
+      elif (rc == Gtk.ResponseType.CANCEL):
+          return Gtk.ResponseType.NO
       else:
           return rc
   
   def errorMessage(self, message):
-      dlg = gtk.MessageDialog(None, 0,
-                              gtk.MESSAGE_ERROR,
-                              gtk.BUTTONS_OK,
+      dlg = Gtk.MessageDialog(None, 0,
+                              Gtk.MessageType.ERROR,
+                              Gtk.ButtonsType.OK,
                               message)
       dlg.show_all()
       rc = dlg.run()
@@ -1128,9 +1130,9 @@ class InputController:
       return rc
   
   def infoMessage(self, message):
-      dlg = gtk.MessageDialog(None, 0,
-                              gtk.MESSAGE_INFO,
-                              gtk.BUTTONS_OK,
+      dlg = Gtk.MessageDialog(None, 0,
+                              Gtk.MessageType.INFO,
+                              Gtk.ButtonsType.OK,
                               message)
       dlg.show_all()
       rc = dlg.run()
@@ -1138,21 +1140,21 @@ class InputController:
       return rc
   
   def simpleInfoMessage(self, message):
-      dlg = gtk.MessageDialog(None, 0,
-                              gtk.MESSAGE_INFO,
-                              gtk.BUTTONS_OK,
+      dlg = Gtk.MessageDialog(None, 0,
+                              Gtk.MessageType.INFO,
+                              Gtk.ButtonsType.OK,
                               message)
       dlg.show_all()
       rc = dlg.run()
       dlg.destroy()
-      if (rc == gtk.RESPONSE_NO):
-          return gtk.RESPONSE_NO
-      elif (rc == gtk.RESPONSE_DELETE_EVENT):
-          return gtk.RESPONSE_NO
-      elif (rc == gtk.RESPONSE_CLOSE):
-          return gtk.RESPONSE_NO
-      elif (rc == gtk.RESPONSE_CANCEL):
-          return gtk.RESPONSE_NO
+      if (rc == Gtk.ResponseType.NO):
+          return Gtk.ResponseType.NO
+      elif (rc == Gtk.ResponseType.DELETE_EVENT):
+          return Gtk.ResponseType.NO
+      elif (rc == Gtk.ResponseType.CLOSE):
+          return Gtk.ResponseType.NO
+      elif (rc == Gtk.ResponseType.CANCEL):
+          return Gtk.ResponseType.NO
       else:
           return rc
   
@@ -1172,12 +1174,15 @@ class MigrateDialog:
         gladepath = 'migrate_extents.glade'
         if not os.path.exists(gladepath):
             gladepath = "%s/%s" % (INSTALLDIR, gladepath)
-        gtk.glade.bindtextdomain(PROGNAME)
-        self.glade_xml = gtk.glade.XML (gladepath, domain=PROGNAME)
+        # Note: gtk.glade.bindtextdomain and gtk.glade.XML are replaced with Gtk.Builder
+        # This will need to be updated when converting glade files to UI files
+        self.glade_xml = Gtk.Builder()
+        self.glade_xml.set_translation_domain(PROGNAME)
+        self.glade_xml.add_from_file(gladepath)
         
         # fill out lv selection combobox
-        self.lv_combo = gtk.combo_box_new_text()
-        self.glade_xml.get_widget('lv_selection_container').pack_end(self.lv_combo)
+        self.lv_combo = Gtk.ComboBoxText()
+        self.glade_xml.get_object('lv_selection_container').pack_end(self.lv_combo)
         self.lv_combo.show()
         self.lv_combo.set_sensitive(False)
         for lv in lvs:
@@ -1187,8 +1192,8 @@ class MigrateDialog:
         self.lv_combo.set_active_iter(iter)
         
         # fill out pv selection combobox
-        pv_selection_container = self.glade_xml.get_widget('pv_selection_container')
-        self.pv_combo = gtk.combo_box_new_text()
+        pv_selection_container = self.glade_xml.get_object('pv_selection_container')
+        self.pv_combo = Gtk.ComboBoxText()
         pv_selection_container.pack_end(self.pv_combo)
         self.pv_combo.show()
         self.pv_combo.set_sensitive(False)
@@ -1201,28 +1206,28 @@ class MigrateDialog:
         else:
             pv_selection_container.hide()
         
-        self.dlg = self.glade_xml.get_widget('dialog1')
-        msg_label = self.glade_xml.get_widget('msg_label')
+        self.dlg = self.glade_xml.get_object('dialog1')
+        msg_label = self.glade_xml.get_object('msg_label')
         self.dlg.set_title(_("Migrate extents"))
         if migrate:
             msg_label.hide()
         else:
             # remove
-            self.glade_xml.get_widget('lv_selection_container').hide()
+            self.glade_xml.get_object('lv_selection_container').hide()
         
         # events
-        self.glade_xml.get_widget('choose_pv_radio').connect('clicked', self.on_choose_pv_radio)
-        self.glade_xml.get_widget('choose_lv_check').connect('clicked', self.on_choose_lv_check)
+        self.glade_xml.get_object('choose_pv_radio').connect('clicked', self.on_choose_pv_radio)
+        self.glade_xml.get_object('choose_lv_check').connect('clicked', self.on_choose_lv_check)
         
     
     def on_choose_pv_radio(self, obj1):
-        if self.glade_xml.get_widget('choose_pv_radio').get_active():
+        if self.glade_xml.get_object('choose_pv_radio').get_active():
             self.pv_combo.set_sensitive(True)
         else:
             self.pv_combo.set_sensitive(False)
     
     def on_choose_lv_check(self, obj1):
-        if self.glade_xml.get_widget('choose_lv_check').get_active():
+        if self.glade_xml.get_object('choose_lv_check').get_active():
             self.lv_combo.set_sensitive(True)
         else:
             self.lv_combo.set_sensitive(False)
@@ -1230,30 +1235,30 @@ class MigrateDialog:
     def run(self):
         rc = self.dlg.run()
         self.dlg.hide()
-        return rc == gtk.RESPONSE_OK
+        return rc == Gtk.ResponseType.OK
     
     # return [pv to migrate to, policy (0 - inherit, 1 - normal, 2 - contiguous, 3 - anywhere), lv to migrate from]
     def get_data(self):
         ret = []
         
         # migrate extents to
-        if self.glade_xml.get_widget('choose_pv_radio').get_active() == True:
+        if self.glade_xml.get_object('choose_pv_radio').get_active() == True:
             iter = self.pv_combo.get_active_iter()
             ret.append(self.pv_combo.get_model().get_value(iter, 0))
         else:
             ret.append(None)
         
-        if self.glade_xml.get_widget('radiobutton4').get_active():
+        if self.glade_xml.get_object('radiobutton4').get_active():
             ret.append(0)
-        elif self.glade_xml.get_widget('radiobutton5').get_active():
+        elif self.glade_xml.get_object('radiobutton5').get_active():
             ret.append(1)
-        elif self.glade_xml.get_widget('radiobutton6').get_active():
+        elif self.glade_xml.get_object('radiobutton6').get_active():
             ret.append(2)
         else:
             ret.append(3)
         
         # lv to migrate from
-        if self.glade_xml.get_widget('choose_lv_check').get_active():
+        if self.glade_xml.get_object('choose_lv_check').get_active():
             iter = self.lv_combo.get_active_iter()
             ret.append(self.lv_combo.get_model().get_value(iter, 0))
         else:
@@ -1320,19 +1325,22 @@ class LV_edit_props:
         gladepath = 'lv_edit_props.glade'
         if not os.path.exists(gladepath):
             gladepath = "%s/%s" % (INSTALLDIR, gladepath)
-        gtk.glade.bindtextdomain(PROGNAME)
-        self.glade_xml = gtk.glade.XML (gladepath, domain=PROGNAME)
-        self.dlg = self.glade_xml.get_widget('dialog1')
+        # Note: gtk.glade.bindtextdomain and gtk.glade.XML are replaced with Gtk.Builder
+        # This will need to be updated when converting glade files to UI files
+        self.glade_xml = Gtk.Builder()
+        self.glade_xml.set_translation_domain(PROGNAME)
+        self.glade_xml.add_from_file(gladepath)
+        self.dlg = self.glade_xml.get_object('dialog1')
         
-        self.size_units_combo = gtk.combo_box_new_text()
-        self.glade_xml.get_widget('size_units_container').pack_end(self.size_units_combo)
+        self.size_units_combo = Gtk.ComboBoxText()
+        self.glade_xml.get_object('size_units_container').pack_end(self.size_units_combo)
         self.size_units_combo.show()
         
-        self.filesys_combo = gtk.combo_box_new_text()
-        self.glade_xml.get_widget('filesys_container').pack_start(self.filesys_combo)
+        self.filesys_combo = Gtk.ComboBoxText()
+        self.glade_xml.get_object('filesys_container').pack_start(self.filesys_combo)
         self.filesys_combo.show()
-        self.fs_config_button = gtk.Button(_("Options"))
-        self.glade_xml.get_widget('filesys_container').pack_end(self.fs_config_button)
+        self.fs_config_button = Gtk.Button(label=_("Options"))
+        self.glade_xml.get_object('filesys_container').pack_end(self.fs_config_button)
         #self.fs_config_button.show()
         self.fs_config_button.hide()
         
@@ -1343,15 +1351,15 @@ class LV_edit_props:
         self.setup_dlg()
         while True:
             rc = self.dlg.run()
-            if rc == gtk.RESPONSE_REJECT:
+            if rc == Gtk.ResponseType.REJECT:
                 self.setup_dlg()
                 continue
-            elif rc == gtk.RESPONSE_OK:
+            elif rc == Gtk.ResponseType.OK:
                 try:
                     if self.apply() == True:
                         need_reload = True
                         break
-                except CommandError, e:
+                except CommandError as e:
                     self.errorMessage(e.getMessage())
                     need_reload = True
                     break
@@ -1376,7 +1384,7 @@ class LV_edit_props:
                 self.dlg.set_title(_("Edit Logical Volume"))
         
         # lv name
-        self.name_entry = self.glade_xml.get_widget('lv_name')
+        self.name_entry = self.glade_xml.get_object('lv_name')
         if self.new:
             self.name_entry.set_text('')
         else:
@@ -1384,42 +1392,43 @@ class LV_edit_props:
         
         # revert button
         if self.new:
-            self.glade_xml.get_widget('revert_button').hide()
+            self.glade_xml.get_object('revert_button').hide()
         else:
-            self.glade_xml.get_widget('revert_button').show()
+            self.glade_xml.get_object('revert_button').show()
         
         # lv properties
         # TODO: use ACCEPTABLE_STRIPE_SIZES
-        stripe_size_combo = self.glade_xml.get_widget('stripe_size')
+        stripe_size_combo = self.glade_xml.get_object('stripe_size')
         model = stripe_size_combo.get_model()
         iter = model.get_iter_first()
         stripe_size_combo.set_active_iter(iter)
         if self.new:
             if self.snapshot:
-                self.glade_xml.get_widget('lv_properties_frame').hide()
+                self.glade_xml.get_object('lv_properties_frame').hide()
             else:
-                self.glade_xml.get_widget('stripes_container').set_sensitive(False)
-                stripe_size_combo = self.glade_xml.get_widget('stripe_size')
+                self.glade_xml.get_object('stripes_container').set_sensitive(False)
+                stripe_size_combo = self.glade_xml.get_object('stripe_size')
                 model = stripe_size_combo.get_model()
                 iter = model.get_iter_first()
                 stripe_size_combo.set_active_iter(iter)
                 max_stripes = len(self.vg.get_pvs())
                 if max_stripes > 8:
                     max_stripes = 8
-                self.glade_xml.get_widget('stripes_num').set_range(2, max_stripes)
-                self.glade_xml.get_widget('stripes_num').set_update_policy(gtk.UPDATE_IF_VALID)
+                self.glade_xml.get_object('stripes_num').set_range(2, max_stripes)
+                # Note: set_update_policy is deprecated in GTK3, policy is now automatic
+                # self.glade_xml.get_object('stripes_num').set_update_policy(Gtk.UPDATE_IF_VALID)
         else:
             if self.lv.is_snapshot():
-                self.glade_xml.get_widget('lv_properties_frame').hide()
+                self.glade_xml.get_object('lv_properties_frame').hide()
             else:
-                self.glade_xml.get_widget('linear').hide()
-                self.glade_xml.get_widget('striped').hide()
-                self.glade_xml.get_widget('stripes_container').hide()
+                self.glade_xml.get_object('linear').hide()
+                self.glade_xml.get_object('striped').hide()
+                self.glade_xml.get_object('stripes_container').hide()
         
         # filesystem
-        self.glade_xml.get_widget('filesys_container').remove(self.filesys_combo)
-        self.filesys_combo = gtk.combo_box_new_text()
-        self.glade_xml.get_widget('filesys_container').pack_start(self.filesys_combo)
+        self.glade_xml.get_object('filesys_container').remove(self.filesys_combo)
+        self.filesys_combo = Gtk.ComboBoxText()
+        self.glade_xml.get_object('filesys_container').pack_start(self.filesys_combo)
         self.filesys_combo.show()
         self.filesys_combo.append_text(self.fs.name)
         for filesys in self.filesystems:
@@ -1430,25 +1439,25 @@ class LV_edit_props:
         self.filesys_combo.set_active_iter(iter)
         self.filesys_show_hide()
         if self.snapshot:
-            self.glade_xml.get_widget('filesys_container').set_sensitive(False)
+            self.glade_xml.get_object('filesys_container').set_sensitive(False)
         elif not self.new:
             if self.lv.is_snapshot():
-                self.glade_xml.get_widget('filesys_container').set_sensitive(False)
-        self.mountpoint_entry = self.glade_xml.get_widget('mount_point')
+                self.glade_xml.get_object('filesys_container').set_sensitive(False)
+        self.mountpoint_entry = self.glade_xml.get_object('mount_point')
         if self.new:
             self.mountpoint_entry.set_text('')
         else:
             self.mountpoint_entry.set_text(self.mount_point)
-        self.glade_xml.get_widget('mount').set_active(self.mount)
-        self.glade_xml.get_widget('mount_at_reboot').set_active(self.mount_at_reboot)
+        self.glade_xml.get_object('mount').set_active(self.mount)
+        self.glade_xml.get_object('mount_at_reboot').set_active(self.mount_at_reboot)
         self.on_mount_changed(None)
         
         # size
-        self.size_scale = self.glade_xml.get_widget('size_scale')
-        self.size_entry = self.glade_xml.get_widget('size_entry')
-        self.glade_xml.get_widget('size_units_container').remove(self.size_units_combo)
-        self.size_units_combo = gtk.combo_box_new_text()
-        self.glade_xml.get_widget('size_units_container').pack_end(self.size_units_combo)
+        self.size_scale = self.glade_xml.get_object('size_scale')
+        self.size_entry = self.glade_xml.get_object('size_entry')
+        self.glade_xml.get_object('size_units_container').remove(self.size_units_combo)
+        self.size_units_combo = Gtk.ComboBoxText()
+        self.glade_xml.get_object('size_units_container').pack_end(self.size_units_combo)
         self.size_units_combo.show()
         for unit in [EXTENTS, GIGABYTES, MEGABYTES, KILOBYTES]:
             self.size_units_combo.append_text(unit)
@@ -1477,20 +1486,20 @@ class LV_edit_props:
         # mirroring
         if self.new:
             self.mirror_to_diff_hds = None # prompt for option
-            self.glade_xml.get_widget('enable_mirroring').set_active(False)
+            self.glade_xml.get_object('enable_mirroring').set_active(False)
         else:
             already_mirrored = self.lv.is_mirrored()
             if already_mirrored:
                 self.mirror_to_diff_hds = False # mirror not resizable => don't care for now
             else:
                 self.mirror_to_diff_hds = None # prompt for option
-            self.glade_xml.get_widget('enable_mirroring').set_active(already_mirrored)
+            self.glade_xml.get_object('enable_mirroring').set_active(already_mirrored)
         self.mirror_to_diff_hds = False
         if MIRRORING_UI_SUPPORT == False:
             if self.new:
-                self.glade_xml.get_widget('enable_mirroring').hide()
+                self.glade_xml.get_object('enable_mirroring').hide()
             else:
-                self.glade_xml.get_widget('lv_properties_frame').hide()
+                self.glade_xml.get_object('lv_properties_frame').hide()
         
         # set up mirror limits
         self.on_enable_mirroring(None)
@@ -1501,61 +1510,61 @@ class LV_edit_props:
         self.size_units_combo.connect('changed', self.on_units_change)
         self.size_scale.connect('adjust-bounds', self.on_size_change_scale)
         self.size_entry.connect('focus-out-event', self.on_size_change_entry)
-        self.glade_xml.get_widget('linear').connect('clicked', self.on_linear_changed)
-        self.glade_xml.get_widget('enable_mirroring').connect('clicked', self.on_enable_mirroring)
-        self.glade_xml.get_widget('striped').connect('clicked', self.on_striped_changed)
-        self.glade_xml.get_widget('mount').connect('clicked', self.on_mount_changed)
-        self.glade_xml.get_widget('mount_at_reboot').connect('clicked', self.on_mount_changed)
-        self.glade_xml.get_widget('use_remaining_button').connect('clicked', self.on_use_remaining)
+        self.glade_xml.get_object('linear').connect('clicked', self.on_linear_changed)
+        self.glade_xml.get_object('enable_mirroring').connect('clicked', self.on_enable_mirroring)
+        self.glade_xml.get_object('striped').connect('clicked', self.on_striped_changed)
+        self.glade_xml.get_object('mount').connect('clicked', self.on_mount_changed)
+        self.glade_xml.get_object('mount_at_reboot').connect('clicked', self.on_mount_changed)
+        self.glade_xml.get_object('use_remaining_button').connect('clicked', self.on_use_remaining)
         
     
     def on_linear_changed(self, obj):
-        if self.glade_xml.get_widget('linear').get_active() == False:
-            self.glade_xml.get_widget('enable_mirroring').set_active(False)
-            self.glade_xml.get_widget('enable_mirroring').set_sensitive(False)
+        if self.glade_xml.get_object('linear').get_active() == False:
+            self.glade_xml.get_object('enable_mirroring').set_active(False)
+            self.glade_xml.get_object('enable_mirroring').set_sensitive(False)
             return
         else:
-            self.glade_xml.get_widget('stripes_container').set_sensitive(False)
-            self.glade_xml.get_widget('enable_mirroring').set_sensitive(True)
+            self.glade_xml.get_object('stripes_container').set_sensitive(False)
+            self.glade_xml.get_object('enable_mirroring').set_sensitive(True)
     def on_striped_changed(self, obj):
-        if self.glade_xml.get_widget('striped').get_active() == False:
+        if self.glade_xml.get_object('striped').get_active() == False:
             return
         pv_list = self.vg.get_pvs()
         if len(pv_list) < 2:  #striping is not an option
             self.errorMessage(CANT_STRIPE_MESSAGE)
-            self.glade_xml.get_widget('linear').set_active(True)
+            self.glade_xml.get_object('linear').set_active(True)
             return
         else:
-            self.glade_xml.get_widget('stripes_container').set_sensitive(True)
+            self.glade_xml.get_object('stripes_container').set_sensitive(True)
     def on_enable_mirroring(self, obj):
-        if self.glade_xml.get_widget('enable_mirroring').get_active() == False:
+        if self.glade_xml.get_object('enable_mirroring').get_active() == False:
             self.update_size_limits()
             return
         # is mirroring supported by lvm version in use?
         if self.model_factory.is_mirroring_supported() == False:
             self.errorMessage(_("Underlying Logical Volume Management does not support mirroring"))
-            self.glade_xml.get_widget('enable_mirroring').set_active(False)
+            self.glade_xml.get_object('enable_mirroring').set_active(False)
             self.update_size_limits()
             return
         # check if lv is striped - no mirroring
         if not self.new:
             if self.lv.is_striped():
                 self.errorMessage(_("Striped Logical Volumes cannot be mirrored."))
-                self.glade_xml.get_widget('enable_mirroring').set_active(False)
+                self.glade_xml.get_object('enable_mirroring').set_active(False)
                 self.update_size_limits()
                 return
         # check if lv is origin - no mirroring
         if not self.new:
             if self.lv.has_snapshots() and not self.lv.is_mirrored():
                 self.errorMessage(_("Logical Volumes with associated snapshots cannot be mirrored yet."))
-                self.glade_xml.get_widget('enable_mirroring').set_active(False)
+                self.glade_xml.get_object('enable_mirroring').set_active(False)
                 self.update_size_limits()
                 return
         
         # mirror images placement: diff HDs or anywhere
         if self.mirror_to_diff_hds == None: # prompt
             rc = self.questionMessage(_("The primary purpose of mirroring is to protect data in the case of hard drive failure. Do you want to place mirror images onto different hard drives?"))
-            if rc == gtk.RESPONSE_YES:
+            if rc == Gtk.ResponseType.YES:
                 self.mirror_to_diff_hds = True
             else:
                 self.mirror_to_diff_hds = False
@@ -1564,12 +1573,12 @@ class LV_edit_props:
         if max_mirror_size == 0:
             if self.mirror_to_diff_hds:
                 self.errorMessage(_("Less than 3 hard drives are available with free space. Disabling mirroring."))
-                self.glade_xml.get_widget('enable_mirroring').set_active(False)
+                self.glade_xml.get_object('enable_mirroring').set_active(False)
                 self.update_size_limits()
                 return
             else:
                 self.errorMessage(_("There must be free space on at least three Physical Volumes to enable mirroring"))
-                self.glade_xml.get_widget('enable_mirroring').set_active(False)
+                self.glade_xml.get_object('enable_mirroring').set_active(False)
                 self.update_size_limits()
                 return
         
@@ -1586,7 +1595,7 @@ class LV_edit_props:
                     units = self.size_units_combo.get_model().get_value(iter, 0)
                     reduce_to_string = str(self.__get_num(max_mirror_size)) + ' ' + units
                     self.errorMessage(message % reduce_to_string)
-                    self.glade_xml.get_widget('enable_mirroring').set_active(False)
+                    self.glade_xml.get_object('enable_mirroring').set_active(False)
                     self.size_entry.select_region(0, (-1))
                     self.size_entry.grab_focus()
                 else:
@@ -1699,8 +1708,8 @@ class LV_edit_props:
             return max_m_size, buck1, buck2, [log]
         
     def on_mount_changed(self, obj):
-        m1 = self.glade_xml.get_widget('mount').get_active()
-        m2 = self.glade_xml.get_widget('mount_at_reboot').get_active()
+        m1 = self.glade_xml.get_object('mount').get_active()
+        m2 = self.glade_xml.get_object('mount_at_reboot').get_active()
         if m1 or m2:
             self.mountpoint_entry.set_sensitive(True)
         else:
@@ -1725,13 +1734,13 @@ class LV_edit_props:
             self.fs_config_button.set_sensitive(False)
         
         if filesys.mountable:
-            self.glade_xml.get_widget('mountpoint_container').set_sensitive(True)
-            self.glade_xml.get_widget('mount_container').set_sensitive(True)
+            self.glade_xml.get_object('mountpoint_container').set_sensitive(True)
+            self.glade_xml.get_object('mount_container').set_sensitive(True)
         else:
-            self.glade_xml.get_widget('mount').set_active(False)
-            self.glade_xml.get_widget('mount_at_reboot').set_active(False)
-            self.glade_xml.get_widget('mountpoint_container').set_sensitive(False)
-            self.glade_xml.get_widget('mount_container').set_sensitive(False)
+            self.glade_xml.get_object('mount').set_active(False)
+            self.glade_xml.get_object('mount_at_reboot').set_active(False)
+            self.glade_xml.get_object('mountpoint_container').set_sensitive(False)
+            self.glade_xml.get_object('mount_container').set_sensitive(False)
         
     
     def update_size_limits(self, upper=None):
@@ -1741,35 +1750,35 @@ class LV_edit_props:
         
         if not self.new:
             if fs_resizable:
-                self.glade_xml.get_widget('fs_not_resizable').hide()
+                self.glade_xml.get_object('fs_not_resizable').hide()
             else:
-                self.glade_xml.get_widget('fs_not_resizable').show()
+                self.glade_xml.get_object('fs_not_resizable').show()
             
             if self.lv.has_snapshots():
-                self.glade_xml.get_widget('origin_not_resizable').show()
-                self.glade_xml.get_widget('free_space_label').hide()
+                self.glade_xml.get_object('origin_not_resizable').show()
+                self.glade_xml.get_object('free_space_label').hide()
                 self.size_scale.set_sensitive(False)
                 self.size_entry.set_sensitive(False)
-                self.glade_xml.get_widget('use_remaining_button').set_sensitive(False)
-                self.glade_xml.get_widget('remaining_space_label').hide()
+                self.glade_xml.get_object('use_remaining_button').set_sensitive(False)
+                self.glade_xml.get_object('remaining_space_label').hide()
                 return
             elif self.lv.is_mirrored():
-                if self.glade_xml.get_widget('enable_mirroring').get_active():
-                    self.glade_xml.get_widget('mirror_not_resizable').show()
-                    self.glade_xml.get_widget('free_space_label').hide()
+                if self.glade_xml.get_object('enable_mirroring').get_active():
+                    self.glade_xml.get_object('mirror_not_resizable').show()
+                    self.glade_xml.get_object('free_space_label').hide()
                     self.size_scale.set_sensitive(False)
                     self.size_entry.set_sensitive(False)
-                    self.glade_xml.get_widget('use_remaining_button').set_sensitive(False)
-                    self.glade_xml.get_widget('remaining_space_label').hide()
+                    self.glade_xml.get_object('use_remaining_button').set_sensitive(False)
+                    self.glade_xml.get_object('remaining_space_label').hide()
                     self.set_size_new(self.size)
                     return
                 else:
-                    self.glade_xml.get_widget('mirror_not_resizable').hide()
-                    self.glade_xml.get_widget('free_space_label').show()
+                    self.glade_xml.get_object('mirror_not_resizable').hide()
+                    self.glade_xml.get_object('free_space_label').show()
                     self.size_scale.set_sensitive(True)
                     self.size_entry.set_sensitive(True)
-                    self.glade_xml.get_widget('use_remaining_button').set_sensitive(True)
-                    self.glade_xml.get_widget('remaining_space_label').show()
+                    self.glade_xml.get_object('use_remaining_button').set_sensitive(True)
+                    self.glade_xml.get_object('remaining_space_label').show()
         
         self.size_lower = 1
         if upper == None:
@@ -1783,12 +1792,12 @@ class LV_edit_props:
             as_new = True
         
         if as_new:
-            self.glade_xml.get_widget('fs_not_resizable').hide()
-            self.glade_xml.get_widget('free_space_label').show()
+            self.glade_xml.get_object('fs_not_resizable').hide()
+            self.glade_xml.get_object('free_space_label').show()
             self.size_scale.set_sensitive(True)
             self.size_entry.set_sensitive(True)
-            self.glade_xml.get_widget('use_remaining_button').set_sensitive(True)
-            self.glade_xml.get_widget('remaining_space_label').show()
+            self.glade_xml.get_object('use_remaining_button').set_sensitive(True)
+            self.glade_xml.get_object('remaining_space_label').show()
         else:
             if not (filesys.extendable_online or filesys.extendable_offline):
                 self.size_upper = self.size
@@ -1796,27 +1805,27 @@ class LV_edit_props:
                 self.size_lower = self.size
             
             if fs_resizable:
-                self.glade_xml.get_widget('fs_not_resizable').hide()
-                self.glade_xml.get_widget('free_space_label').show()
+                self.glade_xml.get_object('fs_not_resizable').hide()
+                self.glade_xml.get_object('free_space_label').show()
                 self.size_scale.set_sensitive(True)
                 self.size_entry.set_sensitive(True)
-                self.glade_xml.get_widget('use_remaining_button').set_sensitive(True)
-                self.glade_xml.get_widget('remaining_space_label').show()
+                self.glade_xml.get_object('use_remaining_button').set_sensitive(True)
+                self.glade_xml.get_object('remaining_space_label').show()
             else:
-                self.glade_xml.get_widget('fs_not_resizable').show()
-                self.glade_xml.get_widget('free_space_label').hide()
+                self.glade_xml.get_object('fs_not_resizable').show()
+                self.glade_xml.get_object('free_space_label').hide()
                 self.size_scale.set_sensitive(False)
                 self.size_entry.set_sensitive(False)
-                self.glade_xml.get_widget('use_remaining_button').set_sensitive(False)
-                self.glade_xml.get_widget('remaining_space_label').hide()
+                self.glade_xml.get_object('use_remaining_button').set_sensitive(False)
+                self.glade_xml.get_object('remaining_space_label').hide()
                 
                 # set old size value
                 self.set_size_new(self.size)
                 
         if self.size_lower < self.size_upper:
-            self.glade_xml.get_widget('size_scale_container').set_sensitive(True)
+            self.glade_xml.get_object('size_scale_container').set_sensitive(True)
         else:
-            self.glade_xml.get_widget('size_scale_container').set_sensitive(False)
+            self.glade_xml.get_object('size_scale_container').set_sensitive(False)
         
         # update values to be within limits
         self.change_size_units()
@@ -1829,9 +1838,9 @@ class LV_edit_props:
         lower = self.__get_num(self.size_lower)
         upper = self.__get_num(self.size_upper)
         
-        size_beg_label = self.glade_xml.get_widget('size_beg')
+        size_beg_label = self.glade_xml.get_object('size_beg')
         size_beg_label.set_text(str(lower))
-        size_end_label = self.glade_xml.get_widget('size_end')
+        size_end_label = self.glade_xml.get_object('size_end')
         size_end_label.set_text(str(upper))
         
         if self.size_lower < self.size_upper:
@@ -1844,15 +1853,15 @@ class LV_edit_props:
         units = self.size_units_combo.get_model().get_value(iter, 0)
         rem = self.size_upper - self.size_new
         rem_vg = self.vg.get_extent_total_used_free()[2]
-        if self.glade_xml.get_widget('enable_mirroring').get_active():
+        if self.glade_xml.get_object('enable_mirroring').get_active():
             mirror_log_size = 1
             rem_vg = rem_vg + (self.size - self.size_new) * 2 - mirror_log_size
         else:
             rem_vg = rem_vg - self.size_new + self.size
         string_vg = REMAINING_SPACE_VG + str(self.__get_num(rem_vg)) + ' ' + units
-        self.glade_xml.get_widget('free_space_label').set_text(string_vg)
+        self.glade_xml.get_object('free_space_label').set_text(string_vg)
         string = REMAINING_SPACE_AFTER + str(self.__get_num(rem)) + ' ' + units
-        self.glade_xml.get_widget('remaining_space_label').set_text(string)
+        self.glade_xml.get_object('remaining_space_label').set_text(string)
     
     def on_use_remaining(self, obj):
         self.set_size_new(self.size_upper)
@@ -1866,7 +1875,7 @@ class LV_edit_props:
         size_float = 0.0
         try:  ##In case gibberish is entered into the size field...
             size_float = float(size_text)
-        except ValueError, e:
+        except ValueError as e:
             self.size_entry.set_text(str(self.__get_num(self.size_new)))
             return False
         self.set_size_new(self.__get_extents(size_float))
@@ -1918,20 +1927,20 @@ class LV_edit_props:
         filesys_new = self.filesystems[self.filesys_combo.get_model().get_value(iter, 0).decode("utf-8")]
         
         if filesys_new.mountable:
-            mount_new = self.glade_xml.get_widget('mount').get_active()
-            mount_at_reboot_new = self.glade_xml.get_widget('mount_at_reboot').get_active()
+            mount_new = self.glade_xml.get_object('mount').get_active()
+            mount_at_reboot_new = self.glade_xml.get_object('mount_at_reboot').get_active()
             mountpoint_new = self.mountpoint_entry.get_text().strip()
         else:
             mount_new = False
             mount_at_reboot_new = False 
             mountpoint_new = ''
         
-        mirrored_new = self.glade_xml.get_widget('enable_mirroring').get_active()
-        striped = self.glade_xml.get_widget('striped').get_active()
-        stripe_size_combo = self.glade_xml.get_widget('stripe_size')
+        mirrored_new = self.glade_xml.get_object('enable_mirroring').get_active()
+        striped = self.glade_xml.get_object('striped').get_active()
+        stripe_size_combo = self.glade_xml.get_object('stripe_size')
         iter = stripe_size_combo.get_active_iter()
         stripe_size = int(stripe_size_combo.get_model().get_value(iter, 0))
-        stripes_num = int(self.glade_xml.get_widget('stripes_num').get_value_as_int())
+        stripes_num = int(self.glade_xml.get_object('stripes_num').get_value_as_int())
         
         # TODO
         fs_options_changed = False
@@ -1985,10 +1994,10 @@ class LV_edit_props:
             # create folder if it doesn't exist
             if os.path.exists(mountpoint_new) == False:  ###stat mnt point
                 rc = self.questionMessage(BAD_MNT_POINT % mountpoint_new)
-                if (rc == gtk.RESPONSE_YES):  #create mount point
+                if (rc == Gtk.ResponseType.YES):  #create mount point
                     try:
                         os.mkdir(mountpoint_new)
-                    except OSError, e:
+                    except OSError as e:
                         self.errorMessage(BAD_MNT_CREATION % mountpoint_new)
                         self.mountpoint_entry.set_text('')
                         return False
@@ -2030,7 +2039,7 @@ class LV_edit_props:
             if not self.snapshot:
                 try:
                     filesys_new.create(lv_path)
-                except CommandError, e:
+                except CommandError as e:
                     self.command_handler.remove_lv(lv_path)
                     raise e
             
@@ -2047,7 +2056,7 @@ class LV_edit_props:
             ext2_to_ext3 = (filesys_new.name == Filesystem.ext3().name) and (self.fs.name == Filesystem.ext2().name)
             if ext2_to_ext3:
                 retval = self.questionMessage(_("Do you want to upgrade ext2 to ext3 preserving data on Logical Volume?"))
-                if (retval == gtk.RESPONSE_NO):
+                if (retval == Gtk.ResponseType.NO):
                     ext2_to_ext3 = False
             
             snapshot = None
@@ -2091,7 +2100,7 @@ class LV_edit_props:
 
             if filesys_change and self.fs.name!=self.fs_none.name and not ext2_to_ext3:
                 retval = self.warningMessage(_("Changing the filesystem will destroy all data on the Logical Volume! Are you sure you want to proceed?"))
-                if (retval == gtk.RESPONSE_NO):
+                if (retval == Gtk.ResponseType.NO):
                     return False
                 unmount_prompt = False
             else:
@@ -2105,7 +2114,7 @@ class LV_edit_props:
             if unmount and mounted:
                 if unmount_prompt:
                     retval = self.warningMessage(UNMOUNT_PROMPT % (self.lv.get_path(), self.mount_point))
-                    if (retval == gtk.RESPONSE_NO):
+                    if (retval == Gtk.ResponseType.NO):
                         return False
                 self.command_handler.unmount(self.mount_point)
                 mounted = False
@@ -2250,7 +2259,7 @@ class LV_edit_props:
             string = string + ':' + str(struct[1]) + '-' + str(struct[1] + struct[2] - 1)
             string = string + '   -> ' + struct[3].get_path()
         rc = self.questionMessage(_("In order to add mirroring, some extents need to be migrated.") + '\n' + string + '\n' + _("Do you want to migrate specified extents?"))
-        if rc == gtk.RESPONSE_YES:
+        if rc == Gtk.ResponseType.YES:
             for struct in structs:
                 pv_from = struct[0]
                 ext_start = struct[1]
@@ -2313,8 +2322,8 @@ class LV_edit_props:
         return ext_count
     
     def errorMessage(self, message):
-        dlg = gtk.MessageDialog(None, 0,
-                                gtk.MESSAGE_ERROR, gtk.BUTTONS_OK,
+        dlg = Gtk.MessageDialog(None, 0,
+                                Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,
                                 message)
         dlg.show_all()
         rc = dlg.run()
@@ -2322,8 +2331,8 @@ class LV_edit_props:
         return rc
     
     def infoMessage(self, message):
-        dlg = gtk.MessageDialog(None, 0,
-                                gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+        dlg = Gtk.MessageDialog(None, 0,
+                                Gtk.MessageType.INFO, Gtk.ButtonsType.OK,
                                 message)
         dlg.show_all()
         rc = dlg.run()
@@ -2331,38 +2340,38 @@ class LV_edit_props:
         return rc
     
     def questionMessage(self, message):
-        dlg = gtk.MessageDialog(None, 0,
-                                gtk.MESSAGE_INFO, gtk.BUTTONS_YES_NO,
+        dlg = Gtk.MessageDialog(None, 0,
+                                Gtk.MessageType.INFO, Gtk.ButtonsType.YES_NO,
                                 message)
         dlg.show_all()
         rc = dlg.run()
         dlg.destroy()
-        if (rc == gtk.RESPONSE_NO):
-            return gtk.RESPONSE_NO
-        elif (rc == gtk.RESPONSE_DELETE_EVENT):
-            return gtk.RESPONSE_NO
-        elif (rc == gtk.RESPONSE_CLOSE):
-            return gtk.RESPONSE_NO
-        elif (rc == gtk.RESPONSE_CANCEL):
-            return gtk.RESPONSE_NO
+        if (rc == Gtk.ResponseType.NO):
+            return Gtk.ResponseType.NO
+        elif (rc == Gtk.ResponseType.DELETE_EVENT):
+            return Gtk.ResponseType.NO
+        elif (rc == Gtk.ResponseType.CLOSE):
+            return Gtk.ResponseType.NO
+        elif (rc == Gtk.ResponseType.CANCEL):
+            return Gtk.ResponseType.NO
         else:
             return rc
     
     def warningMessage(self, message):
-        dlg = gtk.MessageDialog(None, 0,
-                                gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
+        dlg = Gtk.MessageDialog(None, 0,
+                                Gtk.MessageType.WARNING, Gtk.ButtonsType.YES_NO,
                                 message)
         dlg.show_all()
         rc = dlg.run()
         dlg.destroy()
-        if (rc == gtk.RESPONSE_NO):
-            return gtk.RESPONSE_NO
-        elif (rc == gtk.RESPONSE_DELETE_EVENT):
-            return gtk.RESPONSE_NO
-        elif (rc == gtk.RESPONSE_CLOSE):
-            return gtk.RESPONSE_NO
-        elif (rc == gtk.RESPONSE_CANCEL):
-            return gtk.RESPONSE_NO
+        if (rc == Gtk.ResponseType.NO):
+            return Gtk.ResponseType.NO
+        elif (rc == Gtk.ResponseType.DELETE_EVENT):
+            return Gtk.ResponseType.NO
+        elif (rc == Gtk.ResponseType.CLOSE):
+            return Gtk.ResponseType.NO
+        elif (rc == Gtk.ResponseType.CANCEL):
+            return Gtk.ResponseType.NO
         else:
             return rc
 

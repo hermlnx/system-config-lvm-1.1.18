@@ -27,7 +27,7 @@ class Segment:
   
   
   def print_out(self, padding):
-    print padding + str(self.get_start_size())
+    print(padding + str(self.get_start_size()))
   
 
 class StripedSegment(Segment):
@@ -51,7 +51,7 @@ class StripedSegment(Segment):
   def print_out(self, padding):
     Segment.print_out(self, padding + 'striped: ')
     for stripe_id in self.get_stripes():
-      print padding + ' stripe' + str(stripe_id) + ': '
+      print(padding + ' stripe' + str(stripe_id) + ': ')
       self.get_stripes()[stripe_id].print_out(padding + '  ')
   
 
@@ -87,7 +87,7 @@ class UnusedSegment(LinearSegment):
     
   
   def print_out(self, padding):
-    print padding + 'unused: '
+    print(padding + 'unused: ')
     LinearSegment.print_out(self, padding + '  ')
   
 
@@ -120,6 +120,6 @@ class MirroredSegment(Segment):
   
   def print_out(self, padding):
     Segment.print_out(self, padding + 'mirrored: ')
-    print padding + 'images: '
+    print(padding + 'images: ')
     for image in self.get_images():
       image.print_out(padding + '  ')

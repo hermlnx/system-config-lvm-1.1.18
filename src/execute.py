@@ -1,7 +1,9 @@
 import locale
 import time
-import gobject
-import gtk
+# gobject is now part of GObject from gi.repository
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, Gdk, GObject
 import os, sys
 import select
 
@@ -47,7 +49,7 @@ class ProgressPopup:
         self.be_patient_dialog = None
     
     def start(self):
-        self.be_patient_dialog = gtk.Dialog()
+        self.be_patient_dialog = Gtk.Dialog()
         self.be_patient_dialog.set_modal(True)
         
         self.be_patient_dialog.connect("response", self.__on_delete_event)
@@ -56,37 +58,40 @@ class ProgressPopup:
         
         self.be_patient_dialog.set_has_separator(False)
         
-        label = gtk.Label(self.message)
+        label = Gtk.Label(label=self.message)
         self.be_patient_dialog.vbox.pack_start(label, True, True, 0)
         self.be_patient_dialog.set_modal(True)
         
         #Create an alignment object that will center the pbar
-        align = gtk.Alignment(0.5, 0.5, 0, 0)
+        # Note: gtk.Alignment is deprecated in GTK3, using Gtk.Box instead
+        align = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        align.set_halign(Gtk.Align.CENTER)
+        align.set_valign(Gtk.Align.CENTER)
         self.be_patient_dialog.vbox.pack_start(align, False, False, 5)
         align.show()
         
-        self.pbar = gtk.ProgressBar()
+        self.pbar = Gtk.ProgressBar()
         align.add(self.pbar)
         self.pbar.show()
         
         # change cursor
-        cursor = gtk.gdk.Cursor(gtk.gdk.WATCH)
+        cursor = Gdk.Cursor.new(Gdk.CursorType.WATCH)
         self.be_patient_dialog.get_root_window().set_cursor(cursor)
         
         # display dialog
         self.be_patient_dialog.show_all()
         
         #Start bouncing progress bar
-        self.pbar_timer = gobject.timeout_add(100, self.__progress_bar_timeout)
+        self.pbar_timer = GObject.timeout_add(100, self.__progress_bar_timeout)
         
         
     def stop(self):
         # remove timer
-        gobject.source_remove(self.pbar_timer)
+        GObject.source_remove(self.pbar_timer)
         self.pbar_timer = 0
         
         # revert cursor
-        cursor = gtk.gdk.Cursor(gtk.gdk.LEFT_PTR)
+        cursor = Gdk.Cursor.new(Gdk.CursorType.LEFT_PTR)
         self.be_patient_dialog.get_root_window().set_cursor(cursor)
         
         # destroy dialog
@@ -178,7 +183,7 @@ class ForkedCommand:
 
 def _execWithCaptureErrorStatus(command, argv, searchPath = 0, root = '/', stdin = 0, catchfd = 1, catcherrfd = 2, closefd = -1, update_gtk=True):
     if not os.access (root + command, os.X_OK):
-        raise RuntimeError, command + " can not be run"
+        raise RuntimeError(command + " can not be run")
     
     (read, write) = os.pipe()
     (read_err,write_err) = os.pipe()
@@ -238,8 +243,8 @@ def _execWithCaptureErrorStatus(command, argv, searchPath = 0, root = '/', stdin
     
     # let GUI update
     if update_gtk:
-         while gtk.events_pending():
-             gtk.main_iteration()
+         while Gtk.events_pending():
+             Gtk.main_iteration()
 
     os.close(read)
     os.close(read_err)
@@ -247,8 +252,8 @@ def _execWithCaptureErrorStatus(command, argv, searchPath = 0, root = '/', stdin
     status = -1
     try:
         (pid, status) = os.waitpid(childpid, 0)
-    except OSError, (errno, msg):
-        print __name__, "waitpid:", msg
+    except OSError as e:
+        print(__name__, "waitpid:", e.strerror)
     
     if os.WIFEXITED(status):
         status = os.WEXITSTATUS(status)

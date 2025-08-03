@@ -1,4 +1,6 @@
 
+import gettext
+_ = gettext.gettext
 
 ID_UNKNOWN    = 10000 # hope nobody will use this one on real partition table 
 ID_EMPTY      = -1
@@ -123,7 +125,7 @@ class BlockDeviceSegment:
     def getSizeBytes(self):
         return self.getSize() * self.sectorSize
     def printout(self):
-        print ' ', ' ', str(self.beg), str(self.end), str(self.id), str(self.getSize()), str(self.getSizeBytes())
+        print(' ', ' ', str(self.beg), str(self.end), str(self.id), str(self.getSize()), str(self.getSizeBytes()))
 
 class Partition(BlockDeviceSegment):
     def __init__(self, beg, end, id, num, bootable, sectorSize):
@@ -138,7 +140,7 @@ class Partition(BlockDeviceSegment):
             b = 'b'
         else:
             b = ' '
-        print str(seg.num), b, str(seg.beg), str(seg.end), str(seg.id), str(seg.getSize()), str(self.getSizeBytes())
+        print(str(seg.num), b, str(seg.beg), str(seg.end), str(seg.id), str(seg.getSize()), str(self.getSizeBytes()))
         for child in seg.children:
             child.printout()
         

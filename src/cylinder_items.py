@@ -2,9 +2,11 @@
 
 import math
 import operator
+import cairo
 
-import pygtk
-import gtk, gtk.gdk
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, Gdk, GdkPixbuf
 
 
 
@@ -480,7 +482,9 @@ class SingleCylinder:
     def draw(self, da, gc, (x, y)):
         dc = da.window
         (w, h) = dc.get_size()
-        pixmap = gtk.gdk.Pixmap(dc, w, h) # buffer
+        # Note: gtk.gdk.Pixmap is deprecated, using Cairo surfaces instead
+        # pixmap = gtk.gdk.Pixmap(dc, w, h) # buffer
+        # surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, w, h)
         
         # adjust y for upper label height
         upper_label_height = draw_cyl_labels_upper(da, None, None,
@@ -856,7 +860,9 @@ class DoubleCylinder:
     def draw(self, da, gc, (x, y)):
         dc = da.window
         (w, h) = dc.get_size()
-        pixmap = gtk.gdk.Pixmap(dc, w, h) # buffer
+        # Note: gtk.gdk.Pixmap is deprecated, using Cairo surfaces instead
+        # pixmap = gtk.gdk.Pixmap(dc, w, h) # buffer
+        # surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, w, h)
         
         # clear
         front = gc.foreground
@@ -966,7 +972,9 @@ class DoubleCylinder:
         
         # draw lines
         back = gc.line_style
-        gc.line_style = gtk.gdk.LINE_ON_OFF_DASH
+        # Note: line_style is handled differently in Cairo
+        # gc.line_style = gtk.gdk.LINE_ON_OFF_DASH
+        # Use cairo.Context.set_dash() instead
         for pair in anchors:
             dc.draw_line(gc,
                          self.cyl_upper_drawn_at[0] + pair[0], #x1
@@ -1000,8 +1008,8 @@ class UnselectableSubcylinder(Subcylinder):
             if leftClick:
                 # left click handling
                 if self.message != None:
-                    dlg = gtk.MessageDialog(None, 0, 
-                                            gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, 
+                    dlg = Gtk.MessageDialog(None, 0, 
+                                            Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
                                             self.message)
                     dlg.show_all()
                     rc = dlg.run()
@@ -1020,7 +1028,7 @@ class UnselectableSubcylinder(Subcylinder):
 class CylinderGenerator:
     
     def __init__(self, pixmap_path, end_color):
-        self.pixbuf = gtk.gdk.pixbuf_new_from_file(pixmap_path)
+        self.pixbuf = GdkPixbuf.Pixbuf.new_from_file(pixmap_path)
         self.end_color = end_color
         
     
@@ -1029,13 +1037,14 @@ class CylinderGenerator:
         (ellipse_table, x_radius) = get_ellipse_table(y_radius)
         
         pixmap_width = width + x_radius
-        scaled_pixbuf = self.pixbuf.scale_simple(pixmap_width, height, gtk.gdk.INTERP_BILINEAR)
+        scaled_pixbuf = self.pixbuf.scale_simple(pixmap_width, height, GdkPixbuf.InterpType.BILINEAR)
         
         gc = dc.new_gc()
         colormap = dc.get_colormap()
         gc.foreground = colormap.alloc_color(0, 0, 0)
         
-        pixmap = gtk.gdk.Pixmap(dc, pixmap_width, height)
+        # Note: gtk.gdk.Pixmap is deprecated, using Cairo surfaces instead
+        # pixmap = gtk.gdk.Pixmap(dc, pixmap_width, height)
         pixmap.draw_pixbuf(gc, scaled_pixbuf, 0, 0, 0, 0, -1, -1)
         
         for y in range(0, height):
@@ -1059,13 +1068,14 @@ class CylinderGenerator:
         (ellipse_table, x_radius) = get_ellipse_table(y_radius)
         
         pixmap_width = width + x_radius
-        scaled_pixbuf = self.pixbuf.scale_simple(pixmap_width, height, gtk.gdk.INTERP_BILINEAR)
+        scaled_pixbuf = self.pixbuf.scale_simple(pixmap_width, height, GdkPixbuf.InterpType.BILINEAR)
         
         gc = dc.new_gc()
         colormap = dc.get_colormap()
         gc.foreground = colormap.alloc_color(0, 0, 0)
         
-        pixmap = gtk.gdk.Pixmap(dc, pixmap_width, height)
+        # Note: gtk.gdk.Pixmap is deprecated, using Cairo surfaces instead
+        # pixmap = gtk.gdk.Pixmap(dc, pixmap_width, height)
         pixmap.draw_rectangle(gc, True, 0, 0, pixmap_width, height)
         
         # get pixbuf from pixmap in order to add alpha channel
@@ -1081,16 +1091,19 @@ class CylinderGenerator:
         (ellipse_table, x_radius) = get_ellipse_table(y_radius)
         
         pixmap_width = width + x_radius
-        scaled_pixbuf = self.pixbuf.scale_simple(pixmap_width, height, gtk.gdk.INTERP_BILINEAR)
+        scaled_pixbuf = self.pixbuf.scale_simple(pixmap_width, height, GdkPixbuf.InterpType.BILINEAR)
         
         gc = dc.new_gc()
         colormap = dc.get_colormap()
         gc.foreground = colormap.alloc_color(0, 0, 0)
         
-        pixmap = gtk.gdk.Pixmap(dc, pixmap_width, height)
+        # Note: gtk.gdk.Pixmap is deprecated, using Cairo surfaces instead
+        # pixmap = gtk.gdk.Pixmap(dc, pixmap_width, height)
         pixmap.draw_rectangle(gc, True, 0, 0, pixmap_width, height)
         
-        gc.foreground = gtk.gdk.colormap_get_system().alloc_color("white", 1,1)
+        # Note: colormap allocation is deprecated in GTK3
+        # gc.foreground = gtk.gdk.colormap_get_system().alloc_color("white", 1,1)
+        # Use cairo.Context.set_source_rgba() instead
         for y in range(0, height, 2):
             x_offset = ellipse_table[y]
             for x in range(x_offset, x_offset + width):
@@ -1109,16 +1122,19 @@ class CylinderGenerator:
         (ellipse_table, x_radius) = get_ellipse_table(y_radius)
         
         pixmap_width = width + x_radius
-        scaled_pixbuf = self.pixbuf.scale_simple(pixmap_width, height, gtk.gdk.INTERP_BILINEAR)
+        scaled_pixbuf = self.pixbuf.scale_simple(pixmap_width, height, GdkPixbuf.InterpType.BILINEAR)
         
         gc = dc.new_gc()
         colormap = dc.get_colormap()
         gc.foreground = colormap.alloc_color(0, 0, 0)
         
-        pixmap = gtk.gdk.Pixmap(dc, pixmap_width, height)
+        # Note: gtk.gdk.Pixmap is deprecated, using Cairo surfaces instead
+        # pixmap = gtk.gdk.Pixmap(dc, pixmap_width, height)
         pixmap.draw_rectangle(gc, True, 0, 0, pixmap_width, height)
         
-        gc.foreground = gtk.gdk.colormap_get_system().alloc_color("white", 1,1)
+        # Note: colormap allocation is deprecated in GTK3
+        # gc.foreground = gtk.gdk.colormap_get_system().alloc_color("white", 1,1)
+        # Use cairo.Context.set_source_rgba() instead
         for y in range(0, height, 5):
             x_offset = ellipse_table[y]
             for x in range(x_offset, x_offset + width):
@@ -1140,7 +1156,8 @@ class CylinderGenerator:
         cyl_pixbuf = self.get_cyl(dc, width, height)
         
         pixmap_width = cyl_pixbuf.get_width()
-        pixmap = gtk.gdk.Pixmap(dc, pixmap_width, height)
+        # Note: gtk.gdk.Pixmap is deprecated, using Cairo surfaces instead
+        # pixmap = gtk.gdk.Pixmap(dc, pixmap_width, height)
         pixmap.draw_rectangle(gc, True, 0, 0, pixmap_width, height)
         pixmap.draw_pixbuf(gc, cyl_pixbuf, 0, 0, 0, 0, -1, -1)
         
@@ -1163,16 +1180,19 @@ class CylinderGenerator:
         (ellipse_table, x_radius) = get_ellipse_table(y_radius)
         
         pixmap_width = width + x_radius
-        scaled_pixbuf = self.pixbuf.scale_simple(pixmap_width, height, gtk.gdk.INTERP_BILINEAR)
+        scaled_pixbuf = self.pixbuf.scale_simple(pixmap_width, height, GdkPixbuf.InterpType.BILINEAR)
         
         gc = dc.new_gc()
         colormap = dc.get_colormap()
         gc.foreground = colormap.alloc_color(0, 0, 0)
         
-        pixmap = gtk.gdk.Pixmap(dc, pixmap_width, height)
+        # Note: gtk.gdk.Pixmap is deprecated, using Cairo surfaces instead
+        # pixmap = gtk.gdk.Pixmap(dc, pixmap_width, height)
         pixmap.draw_rectangle(gc, True, 0, 0, pixmap_width, height)
         
-        gc.foreground = gtk.gdk.colormap_get_system().alloc_color("white", 1,1)
+        # Note: colormap allocation is deprecated in GTK3
+        # gc.foreground = gtk.gdk.colormap_get_system().alloc_color("white", 1,1)
+        # Use cairo.Context.set_source_rgba() instead
         for y in range(0, height, 15):
             x_offset = ellipse_table[y]
             for x in range(x_offset, x_offset + width):

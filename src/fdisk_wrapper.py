@@ -160,7 +160,7 @@ class FDisk:
                     p = Partition(0, 0, ID_EMPTY, i, False, 0)
                     parts.append(p)
                 else:
-                    print 'A gap in extended partition nums for', devname + '!!!'
+                    print('A gap in extended partition nums for', devname + '!!!')
                     sys.exit()
         
         # sort parts
@@ -201,7 +201,7 @@ class FDisk:
         file.write(SFDISK + ' -uS -L -f ' + devname + ' < ' + TMP_FILE_INPUT + '\n')
         file.flush()
         file.close()
-        os.chmod(TMP_FILE_COMMAND, 0700)
+        os.chmod(TMP_FILE_COMMAND, 0o700)
         #print 'commiting partitions to disk ' + devname
         
         if len(self.getPartitions(devname)) == 0:
@@ -228,4 +228,4 @@ class FDisk:
                 continue
             id = int(line[:2].strip(), 16)
             name = line[2:].strip()
-            print str(id), ':', '\'' + name + '\'' + ','
+            print(str(id), ':', '\'' + name + '\'' + ',')

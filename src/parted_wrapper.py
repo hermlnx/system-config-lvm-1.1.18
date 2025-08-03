@@ -27,7 +27,7 @@ class Parted:
         res, status = execWithCaptureStatus(PARTED, args)
         if status != 0:
             msg = 'parted failed on ' + devpath
-            print msg
+            print(msg)
             raise msg
         
         lines = res.splitlines()
@@ -67,10 +67,10 @@ class Parted:
     
     def savePartTable(self, devpath, parts):
         if len(self.getPartitions(devpath)) != 0:
-            print 'partition table already exists'
+            print('partition table already exists')
             sys.exit(1)
         if len(parts) != 1:
-            print 'parted save implementation is not complete'
+            print('parted save implementation is not complete')
             sys.exit(1)
         
         # create partition table
@@ -83,7 +83,7 @@ class Parted:
         execWithCapture(PARTED, [PARTED, devpath, 'mkpart', 'primary', str(beg), str(end), '-s'])
         # add flags - if any
         if part.id == ID_LINUX_LVM:
-            print execWithCapture(PARTED, [PARTED, devpath, 'set', str(part.num), 'lvm', 'on', '-s'])
+            print(execWithCapture(PARTED, [PARTED, devpath, 'set', str(part.num), 'lvm', 'on', '-s']))
 
 
 
@@ -132,5 +132,5 @@ class Parted:
         res = res.strip()
         words = res.split()
         if len(words) != 3:
-            raise Exception, "unable to get parted version"
+            raise Exception("unable to get parted version")
         return words[2]

@@ -4,7 +4,7 @@ import select
 import math
 import operator
 import signal
-import gobject
+# gobject is now part of GObject from gi.repository
 import string
 import os
 from renderer import DisplayView
@@ -23,17 +23,19 @@ _ = gettext.gettext
 
 ### gettext first, then import gtk (exception prints gettext "_") ###
 try:
-    import gobject
-    import gtk
-    import gtk.glade
-except RuntimeError, e:
-    print _("""
+    # gobject is now part of GObject from gi.repository
+    import gi
+    gi.require_version('Gtk', '3.0')
+    from gi.repository import Gtk
+    from gi.repository import GObject
+except RuntimeError as e:
+    print(_("""
   Unable to initialize graphical environment. Most likely cause of failure
   is that the tool was not run using a graphical environment. Please either
   start your graphical user interface or set your DISPLAY variable.
                                                                                 
   Caught exception: %s
-""") % e
+""") % e)
     sys.exit(-1)
 
 #import gnome
@@ -61,13 +63,13 @@ class Volume_Tab_View:
     self.try_not_best_fit = True
 
     ##Set up list structure
-    self.treeview = self.glade_xml.get_widget('treeview1')
+    self.treeview = self.glade_xml.get_object('treeview1')
     self.treemodel = self.treeview.get_model()
-    self.treemodel = gtk.TreeStore (gobject.TYPE_STRING,
-                                    gobject.TYPE_INT,
-                                    gobject.TYPE_STRING,
-                                    gobject.TYPE_STRING,
-                                    gobject.TYPE_PYOBJECT)
+    self.treemodel = Gtk.TreeStore (GObject.TYPE_STRING,
+                                    GObject.TYPE_INT,
+                                    GObject.TYPE_STRING,
+                                    GObject.TYPE_STRING,
+                                    GObject.TYPE_PYOBJECT)
     self.treeview.set_model(self.treemodel)
     self.treeview.set_headers_visible(False)
     
@@ -85,19 +87,19 @@ class Volume_Tab_View:
     
     self.icon_ellipse_hashtable = {}
     
-    renderer1 = gtk.CellRendererText()
-    column1 = gtk.TreeViewColumn("Volumes",renderer1,markup=0)
+    renderer1 = Gtk.CellRendererText()
+    column1 = Gtk.TreeViewColumn("Volumes",renderer1,markup=0)
     self.treeview.append_column(column1)
     
     
     #Time to set up draw area
-    window1 = self.glade_xml.get_widget("drawingarea1")
+    window1 = self.glade_xml.get_object("drawingarea1")
     window1.set_size_request(700, 500)
-    window2 = self.glade_xml.get_widget("drawingarea2")
+    window2 = self.glade_xml.get_object("drawingarea2")
     window2.set_size_request(700, 500)
-    window3 = self.glade_xml.get_widget("drawingarea3")
+    window3 = self.glade_xml.get_object("drawingarea3")
     window3.set_size_request(700, 500)
-    window4 = self.glade_xml.get_widget("drawingarea4")
+    window4 = self.glade_xml.get_object("drawingarea4")
     window4.set_size_request(700, 500)
     
     pr_upper = Properties_Renderer(window3, window3.window)
@@ -105,32 +107,32 @@ class Volume_Tab_View:
     self.display_view = DisplayView(self.input_controller.register_highlighted_sections, window1, pr_upper, None, None)
     #self.display_view = DisplayView(self.input_controller.register_highlighted_sections, window1, pr_upper, window2, pr_lower)
     
-    self.glade_xml.get_widget('best_fit_button').connect('clicked', self.on_best_fit)
-    self.glade_xml.get_widget('zoom_in_button').connect('clicked', self.on_zoom_in)
-    self.glade_xml.get_widget('zoom_out_button').connect('clicked', self.on_zoom_out)
-    self.glade_xml.get_widget('viewport1').connect('size-allocate', self.on_resize_drawing_area)
+    self.glade_xml.get_object('best_fit_button').connect('clicked', self.on_best_fit)
+    self.glade_xml.get_object('zoom_in_button').connect('clicked', self.on_zoom_in)
+    self.glade_xml.get_object('zoom_out_button').connect('clicked', self.on_zoom_out)
+    self.glade_xml.get_object('viewport1').connect('size-allocate', self.on_resize_drawing_area)
     self.on_best_fit(None)
-    self.glade_xml.get_widget('zoom_box').set_sensitive(False)
+    self.glade_xml.get_object('zoom_box').set_sensitive(False)
     
     # set up mirror copy progress
-    self.mirror_sync_progress = MirrorSyncProgress(self.glade_xml.get_widget('messages_vbox'))
+    self.mirror_sync_progress = MirrorSyncProgress(self.glade_xml.get_object('messages_vbox'))
     
     
     #############################
     ##Highly experimental
-    self.box = self.glade_xml.get_widget('vbox12')
-    self.uninit_panel = self.glade_xml.get_widget('uninit_panel')
+    self.box = self.glade_xml.get_object('vbox12')
+    self.uninit_panel = self.glade_xml.get_object('uninit_panel')
     self.uninit_panel.hide()
-    self.unalloc_panel = self.glade_xml.get_widget('unalloc_panel')
+    self.unalloc_panel = self.glade_xml.get_object('unalloc_panel')
     self.unalloc_panel.hide()
-    self.phys_vol_view_panel = self.glade_xml.get_widget('phys_vol_view_panel')
+    self.phys_vol_view_panel = self.glade_xml.get_object('phys_vol_view_panel')
     self.phys_vol_view_panel.hide()
-    self.log_vol_view_panel = self.glade_xml.get_widget('log_vol_view_panel')
+    self.log_vol_view_panel = self.glade_xml.get_object('log_vol_view_panel')
     self.log_vol_view_panel.hide()
-    self.on_rm_select_lvs_button = self.glade_xml.get_widget('on_rm_select_lvs')
-    self.phys_panel = self.glade_xml.get_widget('phys_panel')
+    self.on_rm_select_lvs_button = self.glade_xml.get_object('on_rm_select_lvs')
+    self.phys_panel = self.glade_xml.get_object('phys_panel')
     self.phys_panel.hide()
-    self.log_panel = self.glade_xml.get_widget('log_panel')
+    self.log_panel = self.glade_xml.get_object('log_panel')
     self.log_panel.hide()
     
     self.prepare_tree()
@@ -145,7 +147,7 @@ class Volume_Tab_View:
         if (lvs_count < MAX_LV_FOR_BESTFIT):
             self.try_not_best_fit = False
         else:
-            self.glade_xml.get_widget('best_fit_button').set_sensitive(False)            
+            self.glade_xml.get_object('best_fit_button').set_sensitive(False)            
     else:
         unallocs = self.model_factory.query_unallocated()
         if len(unallocs) > 0:
@@ -427,7 +429,7 @@ class Volume_Tab_View:
     selection = self.treeview.get_selection()
     model,iter = selection.get_selected()
     if iter == None:
-        self.glade_xml.get_widget('zoom_box').set_sensitive(False)
+        self.glade_xml.get_object('zoom_box').set_sensitive(False)
         self.display_view.render_no_selection()
         self.display_view.draw()
         return
@@ -445,7 +447,7 @@ class Volume_Tab_View:
         pv_list = vg.get_pvs().values()
         self.display_view.render_pvs(pv_list)
         self.on_best_fit(None)
-        self.glade_xml.get_widget('zoom_box').set_sensitive(True)
+        self.glade_xml.get_object('zoom_box').set_sensitive(True)
     elif type == VG_LOG_TYPE:
         self.input_controller.clear_highlighted_sections()
         self.clear_all_buttonpanels()
@@ -455,7 +457,7 @@ class Volume_Tab_View:
         self.show_log_vol_view_panel(lv_list)
         self.display_view.render_lvs(lv_list)
         self.on_best_fit(None)
-        self.glade_xml.get_widget('zoom_box').set_sensitive(True)
+        self.glade_xml.get_object('zoom_box').set_sensitive(True)
     elif type == VG_TYPE:
         self.clear_all_buttonpanels()
         self.input_controller.clear_highlighted_sections()
@@ -464,9 +466,9 @@ class Volume_Tab_View:
         try:
             self.display_view.render_vg(vg)
             self.on_best_fit(None)
-            self.glade_xml.get_widget('zoom_box').set_sensitive(True)
+            self.glade_xml.get_object('zoom_box').set_sensitive(True)
         except:
-            print "Unable to show VG because it contains features that are not supported in current version of system-config-lvm"
+            print("Unable to show VG because it contains features that are not supported in current version of system-config-lvm")
     elif type == LOG_TYPE:
         self.input_controller.clear_highlighted_sections()
         self.clear_all_buttonpanels()
@@ -475,7 +477,7 @@ class Volume_Tab_View:
         lv = model.get_value(iter, OBJ_COL)
         self.display_view.render_lv(lv)
         self.on_best_fit(None)
-        self.glade_xml.get_widget('zoom_box').set_sensitive(False)
+        self.glade_xml.get_object('zoom_box').set_sensitive(False)
     elif type == PHYS_TYPE:
         self.input_controller.clear_highlighted_sections()
         self.clear_all_buttonpanels()
@@ -484,7 +486,7 @@ class Volume_Tab_View:
         pv = model.get_value(iter, OBJ_COL)
         self.display_view.render_pv(pv)
         self.on_best_fit(None)
-        self.glade_xml.get_widget('zoom_box').set_sensitive(True)
+        self.glade_xml.get_object('zoom_box').set_sensitive(True)
     elif type == UNALLOCATED_TYPE:
         self.input_controller.clear_highlighted_sections()
         self.clear_all_buttonpanels()
@@ -493,7 +495,7 @@ class Volume_Tab_View:
         pv = model.get_value(iter, OBJ_COL)
         self.display_view.render_unalloc_pv(pv)
         self.on_best_fit(None)
-        self.glade_xml.get_widget('zoom_box').set_sensitive(False)
+        self.glade_xml.get_object('zoom_box').set_sensitive(False)
     elif type == UNINITIALIZED_TYPE:
         self.input_controller.clear_highlighted_sections()
         self.clear_all_buttonpanels()
@@ -507,13 +509,13 @@ class Volume_Tab_View:
         self.uninit_panel.show()
         self.display_view.render_uninit_pv(uv)
         self.on_best_fit(None)
-        self.glade_xml.get_widget('zoom_box').set_sensitive(False)
+        self.glade_xml.get_object('zoom_box').set_sensitive(False)
     else:
         self.input_controller.clear_highlighted_sections()
         self.clear_all_buttonpanels()
         self.display_view.render_no_selection()
         self.display_view.draw()
-        self.glade_xml.get_widget('zoom_box').set_sensitive(False)
+        self.glade_xml.get_object('zoom_box').set_sensitive(False)
   
   def on_row_expand_collapse(self, treeview, logical,expand, openall, *params):
     treeview.get_model()
@@ -564,16 +566,16 @@ class Volume_Tab_View:
   
   def __set_zoom_buttons(self, (z_in, z_out)):
       if z_in:
-          self.glade_xml.get_widget('zoom_in_button').set_sensitive(True)
+          self.glade_xml.get_object('zoom_in_button').set_sensitive(True)
       else:
-          self.glade_xml.get_widget('zoom_in_button').set_sensitive(False)
+          self.glade_xml.get_object('zoom_in_button').set_sensitive(False)
       if z_out:
-          self.glade_xml.get_widget('zoom_out_button').set_sensitive(True)
+          self.glade_xml.get_object('zoom_out_button').set_sensitive(True)
       else:
-          self.glade_xml.get_widget('zoom_out_button').set_sensitive(False)
+          self.glade_xml.get_object('zoom_out_button').set_sensitive(False)
   
   def on_resize_drawing_area(self, obj1, obj2):
-      self.display_view.set_visible_size(self.glade_xml.get_widget('viewport1').window.get_size())
+      self.display_view.set_visible_size(self.glade_xml.get_object('viewport1').window.get_size())
   
 
 class MirrorSyncProgress:
@@ -597,7 +599,7 @@ class MirrorSyncProgress:
             return
         if self.crank():
             # set up timer to call crank
-            self.timer = gobject.timeout_add(1000, self.crank)
+            self.timer = GObject.timeout_add(1000, self.crank)
     
     def crank(self):
         # initiate lvprobe if not initiated
@@ -632,10 +634,10 @@ class MirrorSyncProgress:
             # add new lvs
             for name in mirrors:
                 if name not in self.progress_bars:
-                    progress = gtk.ProgressBar()
+                    progress = Gtk.ProgressBar()
                     progress.set_text(_("%s mirror synchronisation") % name)
                     progress.set_fraction(mirrors[name]/100.0)
-                    hbox = gtk.HBox()
+                    hbox = Gtk.HBox()
                     hbox.pack_end(progress)
                     self.vbox.pack_start(hbox)
                     self.progress_bars[name] = [hbox, progress]

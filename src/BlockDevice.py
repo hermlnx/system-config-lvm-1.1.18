@@ -284,9 +284,9 @@ class BlockDevice:
         
     
     def printout(self):
-        print 'device: ' + self.dev
-        print str(self.sectorSize * self.sectors), 'bytes,', str(self.sectors), 'sectors,', str(self.cyls), 'cylinders,', str(self.spt), 'sectors/track,', str(self.spc), 'sectors/cylinder'
-        print 'partitions:'
+        print('device: ' + self.dev)
+        print(str(self.sectorSize * self.sectors), 'bytes,', str(self.sectors), 'sectors,', str(self.cyls), 'cylinders,', str(self.spt), 'sectors/track,', str(self.spc), 'sectors/cylinder')
+        print('partitions:')
         for seg in self.__segs:
             seg.printout()
 
