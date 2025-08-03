@@ -1,6 +1,8 @@
 
 import re
 import os
+import gettext
+_ = gettext.gettext
 
 from execute import execWithCapture, execWithCaptureErrorStatus, execWithCaptureStatus, execWithCaptureProgress, execWithCaptureErrorStatusProgress, execWithCaptureStatusProgress
 from CommandError import *
@@ -43,11 +45,11 @@ def get_fs(path):
     else:
         result = cache_file_results[path]
         
-    if re.search('FAT \(12 bit\)', result, re.I):
+    if re.search(r'FAT \(12 bit\)', result, re.I):
         return Unknown('vfat12')
-    elif re.search('FAT \(16 bit\)', result, re.I):
+    elif re.search(r'FAT \(16 bit\)', result, re.I):
         return Unknown('vfat16')
-    elif re.search('FAT \(32 bit\)', result, re.I):
+    elif re.search(r'FAT \(32 bit\)', result, re.I):
         return Unknown('vfat32')
     elif re.search('minix', result, re.I):
         return Unknown('minix')

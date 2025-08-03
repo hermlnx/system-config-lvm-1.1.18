@@ -564,7 +564,8 @@ class Volume_Tab_View:
       self.__set_zoom_buttons(self.display_view.zoom_out())
       self.display_view.draw()
   
-  def __set_zoom_buttons(self, (z_in, z_out)):
+  def __set_zoom_buttons(self, zoom_tuple):
+      z_in, z_out = zoom_tuple
       if z_in:
           self.glade_xml.get_object('zoom_in_button').set_sensitive(True)
       else:

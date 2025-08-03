@@ -1,3 +1,6 @@
+import gettext
+_ = gettext.gettext
+
 
 import copy
 

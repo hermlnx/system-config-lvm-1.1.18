@@ -122,7 +122,7 @@ def get_all_paths(dev_path):
 
     ## in new distributions there is no link from /dev/vg/lv
     ## to /dev/mapper/vg-lv - so we will try to map it directly
-    regex = re.compile("^/dev\/([^\/]*?)\/([^\/]*?)$")
+    regex = re.compile(r"^/dev/([^/]*?)/([^/]*?)$")
     append_paths = []
     for p in paths:
         r = regex.search(p)

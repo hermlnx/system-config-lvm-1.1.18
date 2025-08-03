@@ -18,10 +18,12 @@ class Widget:
         
         self.objects = {}
         
-    def draw(self, dc, gc, (x, y)):
+    def draw(self, dc, gc, pos):
+        x, y = pos
         pass
     
-    def click(self, (x, y), leftClick): # local coordinates
+    def click(self, pos, leftClick): # local coordinates
+        x, y = pos
         return None # nothing selected
     
     def add_object(self, id, obj):
@@ -114,7 +116,8 @@ class CylinderItem(Widget):
         for child in self.children:
             child.set_height(height)
     
-    def draw(self, dc, gc, (x, y)):
+    def draw(self, dc, gc, pos):
+        x, y = pos
         x = x + self.get_width()
         self.children.reverse()
         for child in self.children:
@@ -193,7 +196,8 @@ class CylinderItem(Widget):
     def get_ratio(self):
         return self.ratio
     
-    def click(self, (x, y), leftClick):
+    def click(self, pos, leftClick):
+        x, y = pos
         if x > self.get_width():
             return None
         
@@ -250,7 +254,8 @@ class Separator(CylinderItem):
     def get_smallest_selectable_width(self):
         return 0
     
-    def draw(self, dc, gc, (x, y)):
+    def draw(self, dc, gc, pos):
+        x, y = pos
         if self.cyl_gen == None:
             return
         cyl_pix = self.cyl_gen.get_pattern(self.pattern_id, dc, self.get_width(), self.height)
@@ -263,7 +268,8 @@ class End(CylinderItem):
         CylinderItem.__init__(self)
         self.cyl_gen = cyl_gen
     
-    def draw(self, dc, gc, (x, y)):
+    def draw(self, dc, gc, pos):
+        x, y = pos
         self.cyl_gen.draw_end(dc, gc, x, y, self.height)
     
     def get_smallest_selectable_width(self):
@@ -302,7 +308,8 @@ class Subcylinder(CylinderItem, Highlight):
         else:
             self.unhighlight()
     
-    def draw(self, dc, gc, (x, y)):
+    def draw(self, dc, gc, pos):
+        x, y = pos
         # draw children
         CylinderItem.draw(self, dc, gc, (x, y))
         
@@ -322,7 +329,8 @@ class Subcylinder(CylinderItem, Highlight):
             dc.draw_pixbuf(gc, cyl_pix, 0, 0, x, y)
         
     
-    def click(self, (x, y), leftClick): # local coordinates
+    def click(self, pos, leftClick): # local coordinates
+        x, y = pos
         selection = CylinderItem.click(self, (x, y), leftClick)
         if leftClick:
             # left click handling
@@ -370,7 +378,8 @@ class SingleCylinder:
     def get_selection(self):
         return self.selection
     
-    def click(self, (x, y), leftClick):
+    def click(self, pos, leftClick):
+        x, y = pos
         (ellipse_table, x_radius) = get_ellipse_table(self.height/2)
         
         cyl_x = self.cyl_drawn_at[0]
@@ -479,7 +488,8 @@ class SingleCylinder:
 
         return width, height, upper_label_dim[1]
     
-    def draw(self, da, gc, (x, y)):
+    def draw(self, da, gc, pos):
+        x, y = pos
         dc = da.window
         (w, h) = dc.get_size()
         # Note: gtk.gdk.Pixmap is deprecated, using Cairo surfaces instead
@@ -698,7 +708,8 @@ class DoubleCylinder:
             return []
         return [self.selection]
     
-    def click(self, (x, y), leftClick):
+    def click(self, pos, leftClick):
+        x, y = pos
         (ellipse_table, x_radius) = get_ellipse_table(self.height/2)
         
         cyl = None
@@ -857,7 +868,8 @@ class DoubleCylinder:
         
         return width, height, up_cyl_up_label_dim[1]
     
-    def draw(self, da, gc, (x, y)):
+    def draw(self, da, gc, pos):
+        x, y = pos
         dc = da.window
         (w, h) = dc.get_size()
         # Note: gtk.gdk.Pixmap is deprecated, using Cairo surfaces instead
@@ -1003,7 +1015,8 @@ class UnselectableSubcylinder(Subcylinder):
         self.message = popup_message
         
     
-    def click(self, (x, y), leftClick): # local coordinates
+    def click(self, pos, leftClick): # local coordinates
+        x, y = pos
         if x < self.get_width():
             if leftClick:
                 # left click handling
@@ -1246,7 +1259,7 @@ ellipses_table = {}
 def get_ellipse_table(y_radius):
     global ellipses_table
     
-    if ellipses_table.has_key(y_radius):
+    if y_radius in ellipses_table:
         return ellipses_table[y_radius]
     
     x_radius = y_radius / 2
