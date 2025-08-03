@@ -131,16 +131,153 @@ class baselvm:
 
 
 #############################################################
-def initGlade():
-    gladepath = "lvui.glade"
-    if not os.path.exists(gladepath):
-      gladepath = "%s/%s" % (INSTALLDIR,gladepath)
+def convert_glade_to_ui(glade_content):
+    """Convert old Glade 2.0 format to GTK+ 3 UI format"""
+    import re
+    
+    # Basic conversion from Glade 2.0 to UI format
+    ui_content = glade_content
+    
+    # Replace the DOCTYPE and root element
+    ui_content = re.sub(r'<!DOCTYPE.*?>', '', ui_content, flags=re.DOTALL)
+    ui_content = re.sub(r'<glade-interface>', '<interface>', ui_content)
+    ui_content = re.sub(r'</glade-interface>', '</interface>', ui_content)
+    
+    # Convert widget class names from GTK 2 to GTK 3
+    gtk2_to_gtk3_classes = {
+        'GtkWindow': 'GtkWindow',
+        'GtkVBox': 'GtkBox',
+        'GtkHBox': 'GtkBox', 
+        'GtkVPaned': 'GtkPaned',
+        'GtkHPaned': 'GtkPaned',
+        'GtkScrolledWindow': 'GtkScrolledWindow',
+        'GtkTreeView': 'GtkTreeView',
+        'GtkButton': 'GtkButton',
+        'GtkLabel': 'GtkLabel',
+        'GtkEntry': 'GtkEntry',
+        'GtkComboBox': 'GtkComboBoxText',
+        'GtkMenuItem': 'GtkMenuItem',
+        'GtkMenu': 'GtkMenu',
+        'GtkMenuBar': 'GtkMenuBar',
+        'GtkToolbar': 'GtkToolbar',
+        'GtkSeparatorToolItem': 'GtkSeparatorToolItem',
+        'GtkToolButton': 'GtkToolButton',
+        'GtkNotebook': 'GtkNotebook',
+        'GtkFrame': 'GtkFrame',
+        'GtkCheckButton': 'GtkCheckButton',
+        'GtkRadioButton': 'GtkRadioButton',
+        'GtkSpinButton': 'GtkSpinButton',
+        'GtkProgressBar': 'GtkProgressBar',
+        'GtkDialog': 'GtkDialog',
+        'GtkMessageDialog': 'GtkMessageDialog'
+    }
+    
+    for gtk2_class, gtk3_class in gtk2_to_gtk3_classes.items():
+        ui_content = re.sub(f'class="{gtk2_class}"', f'class="{gtk3_class}"', ui_content)
+    
+    # Add orientation property for Box widgets that were VBox/HBox
+    ui_content = re.sub(
+        r'<widget class="GtkBox" id="([^"]*)">\s*<property name="visible">True</property>',
+        lambda m: f'<object class="GtkBox" id="{m.group(1)}"><property name="visible">True</property><property name="orientation">vertical</property>' 
+        if 'vbox' in m.group(1).lower() else 
+        f'<object class="GtkBox" id="{m.group(1)}"><property name="visible">True</property><property name="orientation">horizontal</property>',
+        ui_content
+    )
+    
+    # Convert widget tags to object tags
+    ui_content = re.sub(r'<widget\s+class="([^"]*)"', r'<object class="\1"', ui_content)
+    ui_content = re.sub(r'</widget>', '</object>', ui_content)
+    
+    # Convert property values from constants to values
+    property_conversions = {
+        'GTK_WINDOW_TOPLEVEL': 'toplevel',
+        'GTK_WIN_POS_NONE': 'none',
+        'GTK_WIN_POS_CENTER': 'center',
+        'GTK_POLICY_AUTOMATIC': 'automatic',
+        'GTK_POLICY_NEVER': 'never',
+        'GTK_SHADOW_IN': 'in',
+        'GTK_SHADOW_OUT': 'out',
+        'GTK_SHADOW_NONE': 'none',
+        'GTK_ORIENTATION_HORIZONTAL': 'horizontal',
+        'GTK_ORIENTATION_VERTICAL': 'vertical',
+        'True': 'True',
+        'False': 'False'
+    }
+    
+    for old_value, new_value in property_conversions.items():
+        ui_content = re.sub(f'>{old_value}<', f'>{new_value}<', ui_content)
+    
+    return ui_content
 
-    # Note: gtk.glade.bindtextdomain and gtk.glade.XML are replaced with Gtk.Builder
-    # This will need to be updated when converting glade files to UI files
+def initGlade():
+    # First try to use the GTK+ 3 compatible UI file, then fall back to others
+    gtk3_ui_file = "lvui_gtk3.ui"
+    ui_file = "lvui.ui" 
+    glade_file = "lvui.glade"
+    
+    # Check for GTK+ 3 UI file first (preferred)
+    if os.path.exists(gtk3_ui_file):
+        gladepath = gtk3_ui_file
+    elif os.path.exists(ui_file):
+        gladepath = ui_file
+    elif os.path.exists(glade_file):
+        gladepath = glade_file
+    else:
+        # Try installed location
+        gtk3_installed = "%s/%s" % (INSTALLDIR, gtk3_ui_file)
+        ui_installed = "%s/%s" % (INSTALLDIR, ui_file)
+        glade_installed = "%s/%s" % (INSTALLDIR, glade_file)
+        if os.path.exists(gtk3_installed):
+            gladepath = gtk3_installed
+        elif os.path.exists(ui_installed):
+            gladepath = ui_installed
+        elif os.path.exists(glade_installed):
+            gladepath = glade_installed
+        else:
+            raise FileNotFoundError(f"No UI file found: {gtk3_ui_file}, {ui_file}, or {glade_file}")
+
     glade_xml = Gtk.Builder()
     glade_xml.set_translation_domain(PROGNAME)
-    glade_xml.add_from_file(gladepath)
+    
+    try:
+        # Try to load the file directly
+        glade_xml.add_from_file(gladepath)
+        if gladepath.endswith('_gtk3.ui'):
+            print(f"Loaded GTK+ 3 compatible UI file: {gladepath}")
+        elif gladepath.endswith('.ui'):
+            print(f"Loaded GTK+ 3 UI file: {gladepath}")
+        else:
+            print(f"Loaded Glade file: {gladepath}")
+            
+    except Exception as e:
+        if "Unhandled tag" in str(e) and "glade-interface" in str(e):
+            # This is an old Glade 2.0 file, try to convert it automatically
+            print(f"Detected old Glade 2.0 format in {gladepath}")
+            print("Attempting automatic conversion to GTK+ 3 UI format...")
+            
+            try:
+                import subprocess
+                ui_file_path = gladepath.replace('.glade', '.ui')
+                result = subprocess.run(['gtk-builder-convert', gladepath, ui_file_path], 
+                                      capture_output=True, text=True)
+                if result.returncode == 0 and os.path.exists(ui_file_path):
+                    print(f"Successfully converted using gtk-builder-convert: {ui_file_path}")
+                    # Try to load the converted file
+                    glade_xml.add_from_file(ui_file_path)
+                    return glade_xml
+                else:
+                    print(f"gtk-builder-convert failed: {result.stderr}")
+                    raise Exception("Automatic conversion failed")
+                    
+            except Exception as convert_error:
+                print(f"Error converting Glade file {gladepath}: {convert_error}")
+                print("Please run 'gtk-builder-convert' manually to convert .glade files to .ui format")
+                print("Example: gtk-builder-convert lvui.glade lvui.ui")
+                raise
+        else:
+            # Some other error, re-raise it
+            raise
+    
     return glade_xml
                                                                                 
 def runFullGUI():
