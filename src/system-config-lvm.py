@@ -23,7 +23,7 @@ import gettext
 gettext.bindtextdomain(PROGNAME, "/usr/share/locale")
 gettext.textdomain(PROGNAME)
 try:
-    gettext.install(PROGNAME, "/usr/share/locale", 1)
+    gettext.install(PROGNAME, "/usr/share/locale")
 except IOError:
     import builtins
     builtins.__dict__['_'] = str
