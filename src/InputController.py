@@ -1730,7 +1730,7 @@ class LV_edit_props:
     
     def filesys_show_hide(self):
         iter = self.filesys_combo.get_active_iter()
-        filesys = self.filesystems[self.filesys_combo.get_model().get_value(iter, 0).decode("utf-8")]
+        filesys = self.filesystems[self.filesys_combo.get_model().get_value(iter, 0)]
         
         if filesys.editable:
             self.fs_config_button.set_sensitive(True)
@@ -1749,7 +1749,7 @@ class LV_edit_props:
     
     def update_size_limits(self, upper=None):
         iter = self.filesys_combo.get_active_iter()
-        filesys = self.filesystems[self.filesys_combo.get_model().get_value(iter, 0).decode("utf-8")]
+        filesys = self.filesystems[self.filesys_combo.get_model().get_value(iter, 0)]
         fs_resizable = (filesys.extendable_online or filesys.extendable_offline or filesys.reducible_online or filesys.reducible_offline)
         
         if not self.new:
@@ -1928,7 +1928,7 @@ class LV_edit_props:
         size_new = int(self.size_new) # in extents
         
         iter = self.filesys_combo.get_active_iter()
-        filesys_new = self.filesystems[self.filesys_combo.get_model().get_value(iter, 0).decode("utf-8")]
+        filesys_new = self.filesystems[self.filesys_combo.get_model().get_value(iter, 0)]
         
         if filesys_new.mountable:
             mount_new = self.glade_xml.get_object('mount').get_active()
