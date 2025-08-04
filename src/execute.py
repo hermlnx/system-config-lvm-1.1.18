@@ -136,8 +136,9 @@ class ForkedCommand:
             
             out, err, res = _execWithCaptureErrorStatus(self.bin, self.args, 0, '/', 0, 1, 2, -1, False)
             # let parent process know result of system call through IPC
-            os.write(self.fd_write_out, out)
-            os.write(self.fd_write_err, err)
+            # Python 3: os.write() expects bytes, encode strings
+            os.write(self.fd_write_out, out.encode('utf-8', errors='replace'))
+            os.write(self.fd_write_err, err.encode('utf-8', errors='replace'))
             os.close(self.fd_write_out)
             os.close(self.fd_write_err)
             

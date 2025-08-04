@@ -140,7 +140,9 @@ class Volume_Tab_View:
     model = self.treeview.get_model()
     vgs = self.model_factory.get_VGs()
     if len(vgs) > 0:
-        model.foreach(self.check_tree_items, [vgs[0].get_name()])
+        # Python 3: dict_values is not subscriptable
+        vgs_list = list(vgs)
+        model.foreach(self.check_tree_items, [vgs_list[0].get_name()])
         
         lvs_count = 0
         for vg in vgs:
@@ -236,7 +238,7 @@ class Volume_Tab_View:
                       NAME_COL, vg_string, 
                       TYPE_COL,
                       UNSELECTABLE_TYPE)
-        self.__sort_list_by_get_name_fcn(vg_list)
+        vg_list = self.__sort_list_by_get_name_fcn(vg_list)
         for vg in vg_list:
             vg_child_iter = treemodel.append(vg_iter)
             vg_name = vg.get_name()
@@ -264,8 +266,8 @@ class Volume_Tab_View:
             
             pv_list = vg.get_pvs().values()
             grouped_dir, ungrouped_list = self.__group_by_device(pv_list)
-            grouped_dir_sorted = grouped_dir.keys()
-            grouped_dir_sorted.sort()
+            # Python 3: dict.keys() returns a view, convert to list and sort
+            grouped_dir_sorted = sorted(grouped_dir.keys())
             for main_dev in grouped_dir_sorted:
                 dev_iter = treemodel.append(phys_iter)
                 pvs = grouped_dir[main_dev]
@@ -410,10 +412,19 @@ class Volume_Tab_View:
       return grouped, ungrouped
   
   def __sort_list_by_get_name_fcn(self, some_list):
+      # Python 3: Convert dict_values to list if needed
+      if hasattr(some_list, 'pop'):
+          working_list = some_list
+          # Clear the original list for in-place modification
+          some_list.clear()
+      else:
+          working_list = list(some_list)
+          # Can't modify dict_values in place, this function needs to return the sorted list
+      
       d = {}
       l = []
-      while len(some_list) != 0:
-          o = some_list.pop()
+      while len(working_list) != 0:
+          o = working_list.pop()
           name = o.get_name()
           if name in d:
               d[name].append(o)
@@ -421,10 +432,19 @@ class Volume_Tab_View:
               d[name] = [o]
               l.append(name)
       l.sort()
+      
+      # Build sorted list
+      sorted_list = []
       for name in l:
           for o in d[name]:
-              some_list.append(o)
-      return some_list
+              sorted_list.append(o)
+      
+      # For lists, add back to original; for dict_values, return new list
+      if hasattr(some_list, 'extend'):
+          some_list.extend(sorted_list)
+          return some_list
+      else:
+          return sorted_list
   
   def on_tree_selection_changed(self, *args):
     selection = self.treeview.get_selection()

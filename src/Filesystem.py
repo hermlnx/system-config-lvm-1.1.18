@@ -587,7 +587,7 @@ class gfs_clustered(Filesystem):
         extendable_online = self.check_path('/sbin/gfs_grow')
         
         # gui stuff
-        gladepath = 'Filesystem.glade'
+        gladepath = 'Filesystem.ui'
         if not os.path.exists(gladepath):
             gladepath = "%s/%s" % (INSTALLDIR, gladepath)
         # Note: gtk.glade.bindtextdomain and gtk.glade.XML are replaced with Gtk.Builder
@@ -931,7 +931,7 @@ class gfs2_clustered(Filesystem):
         extendable_online = self.check_path('/sbin/gfs2_grow')
         
         # gui stuff
-        gladepath = 'Filesystem.glade'
+        gladepath = 'Filesystem.ui'
         if not os.path.exists(gladepath):
             gladepath = "%s/%s" % (INSTALLDIR, gladepath)
         # Note: gtk.glade.bindtextdomain and gtk.glade.XML are replaced with Gtk.Builder
