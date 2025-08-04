@@ -65,6 +65,7 @@
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox1">
         <property name="visible">True</property>
+        <property name="orientation">vertical</property>
         <property name="homogeneous">False</property>
         <property name="spacing">0</property>
         <child internal-child="action_area">
@@ -117,11 +118,13 @@
           <object class="GtkBox" id="vbox1">
             <property name="border_width">3</property>
             <property name="visible">True</property>
+            <property name="orientation">vertical</property>
             <property name="homogeneous">False</property>
             <property name="spacing">3</property>
             <child>
               <object class="GtkBox" id="hbox1">
                 <property name="visible">True</property>
+                <property name="orientation">horizontal</property>
                 <property name="homogeneous">False</property>
                 <property name="spacing">3</property>
                 <child>
@@ -190,11 +193,13 @@
                       <object class="GtkBox" id="linear_striped_mirrored_radios">
                         <property name="border_width">3</property>
                         <property name="visible">True</property>
+                        <property name="orientation">vertical</property>
                         <property name="homogeneous">False</property>
                         <property name="spacing">3</property>
                         <child>
                           <object class="GtkBox" id="hbox11">
                             <property name="visible">True</property>
+                            <property name="orientation">horizontal</property>
                             <property name="homogeneous">False</property>
                             <property name="spacing">25</property>
                             <child>
@@ -243,6 +248,7 @@
                         <child>
                           <object class="GtkBox" id="vbox7">
                             <property name="visible">True</property>
+                            <property name="orientation">vertical</property>
                             <property name="homogeneous">False</property>
                             <property name="spacing">0</property>
                             <child>
@@ -266,6 +272,7 @@
                             </child>
                             <child>
                               <object class="GtkBox" id="stripes_container">
+                                <property name="orientation">horizontal</property>
                                 <property name="visible">True</property>
                                 <property name="homogeneous">False</property>
                                 <property name="spacing">5</property>
@@ -403,6 +410,7 @@
                     <child>
                       <object class="GtkBox" id="vbox4">
                         <property name="visible">True</property>
+                        <property name="orientation">vertical</property>
                         <property name="homogeneous">False</property>
                         <property name="spacing">0</property>
                         <child>
@@ -484,6 +492,7 @@
                         </child>
                         <child>
                           <object class="GtkBox" id="size_units_container">
+                            <property name="orientation">horizontal</property>
                             <property name="border_width">3</property>
                             <property name="visible">True</property>
                             <property name="homogeneous">False</property>
@@ -538,6 +547,7 @@
                         </child>
                         <child>
                           <object class="GtkBox" id="size_scale_container">
+                            <property name="orientation">horizontal</property>
                             <property name="border_width">3</property>
                             <property name="visible">True</property>
                             <property name="homogeneous">False</property>
@@ -609,6 +619,7 @@
                           <object class="GtkBox" id="hbox10">
                             <property name="border_width">3</property>
                             <property name="visible">True</property>
+                            <property name="orientation">horizontal</property>
                             <property name="homogeneous">False</property>
                             <property name="spacing">3</property>
                             <child>
@@ -700,10 +711,12 @@
                       <object class="GtkBox" id="vbox2">
                         <property name="border_width">3</property>
                         <property name="visible">True</property>
+                        <property name="orientation">vertical</property>
                         <property name="homogeneous">False</property>
                         <property name="spacing">3</property>
                         <child>
                           <object class="GtkBox" id="filesys_container">
+                            <property name="orientation">horizontal</property>
                             <property name="visible">True</property>
                             <property name="homogeneous">False</property>
                             <property name="spacing">3</property>
@@ -722,6 +735,7 @@
                         </child>
                         <child>
                           <object class="GtkBox" id="mount_container">
+                            <property name="orientation">horizontal</property>
                             <property name="visible">True</property>
                             <property name="homogeneous">False</property>
                             <property name="spacing">3</property>
@@ -771,6 +785,7 @@
                         </child>
                         <child>
                           <object class="GtkBox" id="mountpoint_container">
+                            <property name="orientation">horizontal</property>
                             <property name="visible">True</property>
                             <property name="homogeneous">False</property>
                             <property name="spacing">3</property>

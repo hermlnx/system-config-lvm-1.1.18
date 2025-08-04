@@ -92,6 +92,7 @@
     <child>
       <object class="GtkBox" id="vbox19">
         <property name="visible">True</property>
+        <property name="orientation">vertical</property>
         <property name="homogeneous">False</property>
         <property name="spacing">0</property>
         <child>
@@ -156,6 +157,7 @@
                         <child>
                           <object class="GtkBox" id="vbox22">
                             <property name="visible">True</property>
+        <property name="orientation">vertical</property>
                             <property name="homogeneous">False</property>
                             <property name="spacing">0</property>
                             <child>
@@ -288,6 +290,7 @@
                         <child>
                           <object class="GtkBox" id="vbox12">
                             <property name="visible">True</property>
+        <property name="orientation">vertical</property>
                             <property name="homogeneous">False</property>
                             <property name="spacing">0</property>
                             <child>
@@ -432,6 +435,7 @@ Physical Volume(s)</property>
                                 <child>
                                   <object class="GtkBox" id="hbox29">
                                     <property name="visible">True</property>
+        <property name="orientation">horizontal</property>
                                     <property name="homogeneous">False</property>
                                     <property name="spacing">0</property>
                                     <child>
@@ -487,6 +491,7 @@ Logical Volume(s)</property>
                                 <child>
                                   <object class="GtkBox" id="hbox31">
                                     <property name="visible">True</property>
+        <property name="orientation">horizontal</property>
                                     <property name="homogeneous">False</property>
                                     <property name="spacing">0</property>
                                     <child>
@@ -602,6 +607,7 @@ Logical Volume</property>
                         <child>
                           <object class="GtkBox" id="messages_vbox">
                             <property name="visible">True</property>
+        <property name="orientation">vertical</property>
                             <property name="homogeneous">False</property>
                             <property name="spacing">0</property>
                             <child>
@@ -623,6 +629,7 @@ Logical Volume</property>
                     <child>
                       <object class="GtkBox" id="vbox20">
                         <property name="visible">True</property>
+        <property name="orientation">vertical</property>
                         <property name="homogeneous">False</property>
                         <property name="spacing">0</property>
                         <child>
@@ -737,6 +744,7 @@ Logical Volume</property>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox1">
         <property name="visible">True</property>
+        <property name="orientation">vertical</property>
         <property name="homogeneous">False</property>
         <property name="spacing">0</property>
         <child internal-child="action_area">
@@ -853,6 +861,7 @@ Logical Volume</property>
                 <child>
                   <object class="GtkBox" id="hbox38">
                     <property name="visible">True</property>
+        <property name="orientation">horizontal</property>
                     <property name="homogeneous">False</property>
                     <property name="spacing">0</property>
                     <child>
@@ -908,6 +917,7 @@ Logical Volume</property>
                 <child>
                   <object class="GtkBox" id="hbox39">
                     <property name="visible">True</property>
+        <property name="orientation">horizontal</property>
                     <property name="homogeneous">False</property>
                     <property name="spacing">0</property>
                     <child>
@@ -963,6 +973,7 @@ Logical Volume</property>
                 <child>
                   <object class="GtkBox" id="hbox40">
                     <property name="visible">True</property>
+        <property name="orientation">horizontal</property>
                     <property name="homogeneous">False</property>
                     <property name="spacing">0</property>
                     <child>
@@ -1018,6 +1029,7 @@ Logical Volume</property>
                 <child>
                   <object class="GtkBox" id="hbox41">
                     <property name="visible">True</property>
+        <property name="orientation">horizontal</property>
                     <property name="homogeneous">False</property>
                     <property name="spacing">0</property>
                     <child>
@@ -1072,6 +1084,7 @@ Logical Volume</property>
                 <child>
                   <object class="GtkBox" id="hbox42">
                     <property name="visible">True</property>
+        <property name="orientation">horizontal</property>
                     <property name="homogeneous">False</property>
                     <property name="spacing">0</property>
                     <child>
@@ -1226,6 +1239,7 @@ Logical Volume</property>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox3">
         <property name="visible">True</property>
+        <property name="orientation">vertical</property>
         <property name="homogeneous">False</property>
         <property name="spacing">0</property>
         <child internal-child="action_area">
@@ -1265,6 +1279,7 @@ Logical Volume</property>
         <child>
           <object class="GtkBox" id="vbox16">
             <property name="visible">True</property>
+        <property name="orientation">vertical</property>
             <property name="homogeneous">False</property>
             <property name="spacing">0</property>
             <child>
@@ -1393,6 +1408,7 @@ Logical Volume</property>
         <child>
           <object class="GtkBox" id="vbox18">
             <property name="visible">True</property>
+        <property name="orientation">vertical</property>
             <property name="homogeneous">False</property>
             <property name="spacing">0</property>
             <child>
@@ -1480,6 +1496,7 @@ Logical Volume</property>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox5">
         <property name="visible">True</property>
+        <property name="orientation">vertical</property>
         <property name="homogeneous">False</property>
         <property name="spacing">0</property>
         <child internal-child="action_area">
@@ -1573,6 +1590,7 @@ Logical Volume</property>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox6">
         <property name="visible">True</property>
+        <property name="orientation">vertical</property>
         <property name="homogeneous">False</property>
         <property name="spacing">0</property>
         <child internal-child="action_area">
@@ -1612,6 +1630,7 @@ Logical Volume</property>
                     <child>
                       <object class="GtkBox" id="hbox37">
                         <property name="visible">True</property>
+        <property name="orientation">horizontal</property>
                         <property name="homogeneous">False</property>
                         <property name="spacing">2</property>
                         <child>
