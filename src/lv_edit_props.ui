@@ -276,7 +276,6 @@
                                     <property name="climb_rate">1</property>
                                     <property name="digits">0</property>
                                     <property name="numeric">True</property>
-                                    <property name="update_policy">GTK_UPDATE_ALWAYS</property>
                                     <property name="snap_to_ticks">False</property>
                                     <property name="wrap">False</property>
                                     <property name="adjustment">adjustment1</property>
@@ -570,7 +569,6 @@
                                 <property name="draw_value">False</property>
                                 <property name="value_pos">GTK_POS_TOP</property>
                                 <property name="digits">2</property>
-                                <property name="update_policy">GTK_UPDATE_CONTINUOUS</property>
                                 <property name="inverted">False</property>
                                 <property name="adjustment">adjustment2</property>
                               </object>

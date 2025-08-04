@@ -102,8 +102,9 @@ class Volume_Tab_View:
     window4 = self.glade_xml.get_object("drawingarea4")
     window4.set_size_request(700, 500)
     
-    pr_upper = Properties_Renderer(window3, window3.window)
-    #pr_lower = Properties_Renderer(window4, window4.window)
+    # GTK+ 3 compatibility: widget.window is deprecated, use None for now
+    pr_upper = Properties_Renderer(window3, None)
+    #pr_lower = Properties_Renderer(window4, None)
     self.display_view = DisplayView(self.input_controller.register_highlighted_sections, window1, pr_upper, None, None)
     #self.display_view = DisplayView(self.input_controller.register_highlighted_sections, window1, pr_upper, window2, pr_lower)
     

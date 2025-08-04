@@ -56,7 +56,7 @@ class ProgressPopup:
         self.be_patient_dialog.connect("close", self.__on_delete_event)
         self.be_patient_dialog.connect("delete_event", self.__on_delete_event)
         
-        self.be_patient_dialog.set_has_separator(False)
+        # GTK+ 3: set_has_separator is deprecated and no longer needed
         
         label = Gtk.Label(label=self.message)
         self.be_patient_dialog.vbox.pack_start(label, True, True, 0)
@@ -224,20 +224,20 @@ def _execWithCaptureErrorStatus(command, argv, searchPath = 0, root = '/', stdin
     os.close(write)
     os.close(write_err)
     
-    rc = ""
-    rc_err = ""
+    rc = b""
+    rc_err = b""
     in_list = [read, read_err]
     while len(in_list) != 0:
         i,o,e = select.select(in_list, [], [], 0.1)
         for fd in i:
             if fd == read:
                 s = os.read(read, 1000)
-                if s == '':
+                if s == b'':
                     in_list.remove(read)
                 rc = rc + s
             if fd == read_err:
                 s = os.read(read_err, 1000)
-                if s == '':
+                if s == b'':
                     in_list.remove(read_err)
                 rc_err = rc_err + s
     
@@ -259,5 +259,13 @@ def _execWithCaptureErrorStatus(command, argv, searchPath = 0, root = '/', stdin
         status = os.WEXITSTATUS(status)
     else:
         status = -1
+    
+    # Convert bytes to strings for Python 3 compatibility
+    try:
+        rc = rc.decode('utf-8', errors='replace')
+        rc_err = rc_err.decode('utf-8', errors='replace')
+    except AttributeError:
+        # In case rc/rc_err are already strings (shouldn't happen in normal flow)
+        pass
     
     return (rc, rc_err, status)

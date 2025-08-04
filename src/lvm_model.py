@@ -206,7 +206,8 @@ class lvm_model:
       devs[multipath] = segments
     for devname in devs:
       self.__query_partitions2(devname, devs[devname], parts, segs)
-    for pv in parts.values()[:]:
+    # Python 3: dict.values() returns a view, not a list
+    for pv in list(parts.values()):
       devname = pv.getPartition()[0]
       if devname in multipath_data:
         parts.pop(pv.get_path())
@@ -580,9 +581,11 @@ class lvm_model:
   def __link_mirrors(self):
     for vgname in self.__VGs:
       vg = self.__VGs[vgname]
-      lv_names = vg.get_lvs().keys()[:]
+      # Python 3: dict.keys() returns a view, not a list
+      lv_names = list(vg.get_lvs().keys())
       for lvname in lv_names:
-        if vg.get_lvs().has_key(lvname):
+        # Python 3: has_key() is removed, use 'in' operator
+        if lvname in vg.get_lvs():
           lv = vg.get_lvs()[lvname]
           if lv.is_mirrored():
             # replace tmp lvs with real one

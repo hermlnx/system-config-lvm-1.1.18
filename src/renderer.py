@@ -75,16 +75,19 @@ class DisplayView:
             self.dvH = DisplayView(None, da2, properties_renderer2) 
         self.dvH_selectable = False
         
-        self.gc = self.da.window.new_gc()
+        # GTK+ 3 compatibility: widget.window is deprecated
+        # For now, use None and handle gracefully in drawing methods
+        self.gc = None
         # Note: Colormap allocation is handled differently in GTK3
         # Using RGBA colors instead of gtk.gdk.colormap_get_system()
         white = Gdk.RGBA(1.0, 1.0, 1.0, 1.0)  # white
         black = Gdk.RGBA(0.0, 0.0, 0.0, 1.0)  # black
-        self.gc.foreground = black
-        self.gc.background = white
+        # self.gc.foreground = black  # Skip for GTK+ 3 compatibility
+        # self.gc.background = white  # Skip for GTK+ 3 compatibility
         
         self.da.add_events(Gdk.EventMask.BUTTON_PRESS_MASK)
-        self.da.connect('expose-event', self.expose)
+        # GTK+ 3: expose-event is replaced with draw signal
+        self.da.connect('draw', self.draw)
         self.da.connect('button_press_event', self.mouse_event)
         
         self.message = ''
@@ -600,10 +603,13 @@ class DisplayView:
         
         
     
-    def expose(self, obj1, obj2):
-        self.draw()
+    def draw(self, widget, cairo_context):
+        # GTK+ 3: draw signal receives cairo context instead of expose event
+        # For now, call the existing draw method but return False to indicate we handled it
+        self.render()
+        return False
     
-    def draw(self):
+    def render(self):
         if self.display != None:
             w, h, u_label_h = self.display.minimum_pixmap_dimension(self.da)
             y_offset = Y_OFFSET - u_label_h
@@ -688,4 +694,4 @@ class DisplayView:
                 else:
                     self.dvH.render_multiple_selection()
             
-            self.draw()
+            self.render()
