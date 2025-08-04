@@ -452,7 +452,7 @@ class Volume_Tab_View:
     if iter == None:
         self.glade_xml.get_object('zoom_box').set_sensitive(False)
         self.display_view.render_no_selection()
-        self.display_view.draw()
+        self.display_view.redraw()
         return
     
     treepath = model.get_path(iter)
@@ -535,7 +535,7 @@ class Volume_Tab_View:
         self.input_controller.clear_highlighted_sections()
         self.clear_all_buttonpanels()
         self.display_view.render_no_selection()
-        self.display_view.draw()
+        self.display_view.redraw()
         self.glade_xml.get_object('zoom_box').set_sensitive(False)
   
   def on_row_expand_collapse(self, treeview, logical,expand, openall, *params):
@@ -575,15 +575,15 @@ class Volume_Tab_View:
 
       self.on_resize_drawing_area(None, None)
       self.__set_zoom_buttons(self.display_view.set_best_fit(self.try_not_best_fit))
-      self.display_view.draw()
+      self.display_view.redraw()
   
   def on_zoom_in(self, obj):
       self.__set_zoom_buttons(self.display_view.zoom_in())
-      self.display_view.draw()
+      self.display_view.redraw()
   
   def on_zoom_out(self, obj):
       self.__set_zoom_buttons(self.display_view.zoom_out())
-      self.display_view.draw()
+      self.display_view.redraw()
   
   def __set_zoom_buttons(self, zoom_tuple):
       z_in, z_out = zoom_tuple
@@ -664,8 +664,8 @@ class MirrorSyncProgress:
                     progress.set_text(_("%s mirror synchronisation") % name)
                     progress.set_fraction(mirrors[name]/100.0)
                     hbox = Gtk.HBox()
-                    hbox.pack_end(progress)
-                    self.vbox.pack_start(hbox)
+                    hbox.pack_end(progress, False, False, 0)
+                    self.vbox.pack_start(hbox, False, False, 0)
                     self.progress_bars[name] = [hbox, progress]
             # remove completed or renamed lvs
             # Python 3: dict.keys() returns a view, convert to list for slicing

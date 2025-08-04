@@ -1078,90 +1078,18 @@ Logical Volume</property>
                       <object class="GtkComboBoxText" id="new_vg_extent_size">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <child>
-                          <object class="GtkMenu" id="menu4">
-                            <child>
-                              <object class="GtkMenuItem" id="13">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">2</property>
-                                <property name="use_underline">True</property>
-                                <signal name="activate" handler="on_13_activate" last_modification_time="Thu, 09 Sep 2004 12:50:57 GMT"/>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkMenuItem" id="14">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">4</property>
-                                <property name="use_underline">True</property>
-                                <signal name="activate" handler="on_14_activate" last_modification_time="Thu, 09 Sep 2004 12:50:57 GMT"/>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkMenuItem" id="15">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">8</property>
-                                <property name="use_underline">True</property>
-                                <signal name="activate" handler="on_15_activate" last_modification_time="Thu, 09 Sep 2004 12:50:57 GMT"/>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkMenuItem" id="16">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">16</property>
-                                <property name="use_underline">True</property>
-                                <signal name="activate" handler="on_16_activate" last_modification_time="Thu, 09 Sep 2004 12:50:57 GMT"/>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkMenuItem" id="17">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">32</property>
-                                <property name="use_underline">True</property>
-                                <signal name="activate" handler="on_17_activate" last_modification_time="Thu, 09 Sep 2004 12:50:57 GMT"/>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkMenuItem" id="18">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">64</property>
-                                <property name="use_underline">True</property>
-                                <signal name="activate" handler="on_18_activate" last_modification_time="Thu, 09 Sep 2004 12:50:57 GMT"/>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkMenuItem" id="19">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">128</property>
-                                <property name="use_underline">True</property>
-                                <signal name="activate" handler="on_19_activate" last_modification_time="Thu, 09 Sep 2004 12:50:57 GMT"/>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkMenuItem" id="20">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">256</property>
-                                <property name="use_underline">True</property>
-                                <signal name="activate" handler="on_20_activate" last_modification_time="Thu, 09 Sep 2004 12:50:57 GMT"/>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkMenuItem" id="21">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">512</property>
-                                <property name="use_underline">True</property>
-                                <signal name="activate" handler="on_21_activate" last_modification_time="Thu, 09 Sep 2004 12:50:57 GMT"/>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkMenuItem" id="22">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">1024</property>
-                                <property name="use_underline">True</property>
-                                <signal name="activate" handler="on_22_activate" last_modification_time="Thu, 09 Sep 2004 12:50:57 GMT"/>
-                              </object>
-                            </child>
-                          </object>
-                        </child>
+                        <items>
+                          <item translatable="yes">2</item>
+                          <item translatable="yes">4</item>
+                          <item translatable="yes">8</item>
+                          <item translatable="yes">16</item>
+                          <item translatable="yes">32</item>
+                          <item translatable="yes">64</item>
+                          <item translatable="yes">128</item>
+                          <item translatable="yes">256</item>
+                          <item translatable="yes">512</item>
+                          <item translatable="yes">1024</item>
+                        </items>
                       </object>
                       <packing>
                         <property name="padding">0</property>

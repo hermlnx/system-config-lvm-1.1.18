@@ -283,6 +283,8 @@ class DisplayView:
         self.type = VG_PHYS_TYPE
         self.height = HEIGHT_SINGLE
         
+        # Python 3: Convert dict_values to list for indexing
+        pv_list = list(pv_list)
         vg = pv_list[0].get_vg()
         
         # display properties
@@ -336,6 +338,8 @@ class DisplayView:
         self.type = VG_LOG_TYPE
         self.height = HEIGHT_SINGLE
         
+        # Python 3: Convert dict_values to list for indexing
+        lv_list = list(lv_list)
         vg = lv_list[0].get_vg()
         
         # place unused space to the end
@@ -415,8 +419,9 @@ class DisplayView:
         self.type = None
         self.height = HEIGHT_DUAL
         
-        pv_list = vg.get_pvs().values()
-        lv_list = vg.get_lvs().values()
+        # Python 3: Convert dict_values to list for indexing
+        pv_list = list(vg.get_pvs().values())
+        lv_list = list(vg.get_lvs().values())
         
         # place unused space to the end
         for lv in lv_list:
@@ -603,11 +608,15 @@ class DisplayView:
         
         
     
-    def draw(self, widget, cairo_context):
+    def draw(self, widget=None, cairo_context=None):
         # GTK+ 3: draw signal receives cairo context instead of expose event
         # For now, call the existing draw method but return False to indicate we handled it
         self.render()
         return False
+    
+    def redraw(self):
+        # Convenience method for internal calls that don't have widget/context
+        self.render()
     
     def render(self):
         if self.display != None:

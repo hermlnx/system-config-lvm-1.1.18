@@ -490,8 +490,13 @@ class SingleCylinder:
     
     def draw(self, da, gc, pos):
         x, y = pos
-        dc = da.window
-        (w, h) = dc.get_size()
+        # GTK+ 3: Use drawing area dimensions directly instead of window
+        w = da.get_allocated_width()
+        h = da.get_allocated_height()
+        
+        # GTK+ 3: If no graphics context, skip drawing for now
+        if gc is None:
+            return
         # Note: gtk.gdk.Pixmap is deprecated, using Cairo surfaces instead
         # pixmap = gtk.gdk.Pixmap(dc, w, h) # buffer
         # surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, w, h)
@@ -503,11 +508,16 @@ class SingleCylinder:
                                                    False)[1]
         y = y + upper_label_height
         
-        # clear
-        front = gc.foreground
-        gc.foreground = gc.background
-        pixmap.draw_rectangle(gc, True, 0, 0, w, h)
-        gc.foreground = front
+        # GTK+ 3: Handle None graphics context gracefully
+        if gc is not None:
+            # clear (GTK+ 2 style)
+            front = gc.foreground
+            gc.foreground = gc.background
+            pixmap.draw_rectangle(gc, True, 0, 0, w, h)
+            gc.foreground = front
+        else:
+            # GTK+ 3: Drawing will be handled by Cairo context
+            pass
         
         # draw name
         #layout = da.create_pango_layout(self.name)
@@ -870,17 +880,27 @@ class DoubleCylinder:
     
     def draw(self, da, gc, pos):
         x, y = pos
-        dc = da.window
-        (w, h) = dc.get_size()
+        # GTK+ 3: Use drawing area dimensions directly instead of window
+        w = da.get_allocated_width()
+        h = da.get_allocated_height()
+        
+        # GTK+ 3: If no graphics context, skip drawing for now
+        if gc is None:
+            return
         # Note: gtk.gdk.Pixmap is deprecated, using Cairo surfaces instead
         # pixmap = gtk.gdk.Pixmap(dc, w, h) # buffer
         # surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, w, h)
         
-        # clear
-        front = gc.foreground
-        gc.foreground = gc.background
-        pixmap.draw_rectangle(gc, True, 0, 0, w, h)
-        gc.foreground = front
+        # GTK+ 3: Handle None graphics context gracefully
+        if gc is not None:
+            # clear (GTK+ 2 style)
+            front = gc.foreground
+            gc.foreground = gc.background
+            pixmap.draw_rectangle(gc, True, 0, 0, w, h)
+            gc.foreground = front
+        else:
+            # GTK+ 3: Drawing will be handled by Cairo context
+            pass
         
         # labels dimensions
         up_cyl_up_label_dim = draw_cyl_labels_upper(da, None, None,

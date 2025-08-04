@@ -1182,7 +1182,7 @@ class MigrateDialog:
         
         # fill out lv selection combobox
         self.lv_combo = Gtk.ComboBoxText()
-        self.glade_xml.get_object('lv_selection_container').pack_end(self.lv_combo)
+        self.glade_xml.get_object('lv_selection_container').pack_end(self.lv_combo, False, False, 0)
         self.lv_combo.show()
         self.lv_combo.set_sensitive(False)
         for lv in lvs:
@@ -1194,7 +1194,7 @@ class MigrateDialog:
         # fill out pv selection combobox
         pv_selection_container = self.glade_xml.get_object('pv_selection_container')
         self.pv_combo = Gtk.ComboBoxText()
-        pv_selection_container.pack_end(self.pv_combo)
+        pv_selection_container.pack_end(self.pv_combo, False, False, 0)
         self.pv_combo.show()
         self.pv_combo.set_sensitive(False)
         if len(pvs) != 0:
@@ -1322,9 +1322,13 @@ class LV_edit_props:
         for fs_name in self.filesystems:
             self.filesystems[fs_name].set_clustered(vg.clustered())
         
-        gladepath = 'lv_edit_props.glade'
+        # GTK+ 3: Use UI file instead of Glade file
+        gladepath = 'lv_edit_props.ui'
         if not os.path.exists(gladepath):
-            gladepath = "%s/%s" % (INSTALLDIR, gladepath)
+            # Fallback to glade file if UI doesn't exist
+            gladepath = 'lv_edit_props.glade'
+            if not os.path.exists(gladepath):
+                gladepath = "%s/%s" % (INSTALLDIR, gladepath)
         # Note: gtk.glade.bindtextdomain and gtk.glade.XML are replaced with Gtk.Builder
         # This will need to be updated when converting glade files to UI files
         self.glade_xml = Gtk.Builder()
@@ -1333,14 +1337,14 @@ class LV_edit_props:
         self.dlg = self.glade_xml.get_object('dialog1')
         
         self.size_units_combo = Gtk.ComboBoxText()
-        self.glade_xml.get_object('size_units_container').pack_end(self.size_units_combo)
+        self.glade_xml.get_object('size_units_container').pack_end(self.size_units_combo, False, False, 0)
         self.size_units_combo.show()
         
         self.filesys_combo = Gtk.ComboBoxText()
-        self.glade_xml.get_object('filesys_container').pack_start(self.filesys_combo)
+        self.glade_xml.get_object('filesys_container').pack_start(self.filesys_combo, False, False, 0)
         self.filesys_combo.show()
         self.fs_config_button = Gtk.Button(label=_("Options"))
-        self.glade_xml.get_object('filesys_container').pack_end(self.fs_config_button)
+        self.glade_xml.get_object('filesys_container').pack_end(self.fs_config_button, False, False, 0)
         #self.fs_config_button.show()
         self.fs_config_button.hide()
         
@@ -1428,7 +1432,7 @@ class LV_edit_props:
         # filesystem
         self.glade_xml.get_object('filesys_container').remove(self.filesys_combo)
         self.filesys_combo = Gtk.ComboBoxText()
-        self.glade_xml.get_object('filesys_container').pack_start(self.filesys_combo)
+        self.glade_xml.get_object('filesys_container').pack_start(self.filesys_combo, False, False, 0)
         self.filesys_combo.show()
         self.filesys_combo.append_text(self.fs.name)
         for filesys in self.filesystems:
@@ -1457,7 +1461,7 @@ class LV_edit_props:
         self.size_entry = self.glade_xml.get_object('size_entry')
         self.glade_xml.get_object('size_units_container').remove(self.size_units_combo)
         self.size_units_combo = Gtk.ComboBoxText()
-        self.glade_xml.get_object('size_units_container').pack_end(self.size_units_combo)
+        self.glade_xml.get_object('size_units_container').pack_end(self.size_units_combo, False, False, 0)
         self.size_units_combo.show()
         for unit in [EXTENTS, GIGABYTES, MEGABYTES, KILOBYTES]:
             self.size_units_combo.append_text(unit)
