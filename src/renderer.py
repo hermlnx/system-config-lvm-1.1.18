@@ -6,8 +6,10 @@ _ = gettext.gettext
 
 import gi
 gi.require_version('Gtk', '3.0')
+gi.require_version('PangoCairo', '1.0')
 from gi.repository import Gtk, Gdk
 from gi.repository import GObject
+from gi.repository import PangoCairo
 
 
 
@@ -610,13 +612,54 @@ class DisplayView:
     
     def draw(self, widget=None, cairo_context=None):
         # GTK+ 3: draw signal receives cairo context instead of expose event
-        # For now, call the existing draw method but return False to indicate we handled it
-        self.render()
+        if cairo_context:
+            self.cairo_context = cairo_context
+            self.render_cairo()
+        else:
+            self.render()
         return False
     
     def redraw(self):
         # Convenience method for internal calls that don't have widget/context
         self.render()
+        
+    def render_cairo(self):
+        # Cairo-based rendering for GTK+ 3
+        if self.display != None:
+            w, h, u_label_h = self.display.minimum_pixmap_dimension(self.da)
+            y_offset = Y_OFFSET - u_label_h
+            if y_offset < 0:
+                y_offset = 0
+            self.da.set_size_request(w+20, h+y_offset+20)
+            # For now, draw a simple placeholder to show the drawing area is working
+            self.cairo_context.set_source_rgb(0.8, 0.8, 0.8)  # Light gray background
+            self.cairo_context.rectangle(10, y_offset, w, h)
+            self.cairo_context.fill()
+            
+            # Draw a simple text message indicating Cairo drawing is active
+            self.cairo_context.set_source_rgb(0.0, 0.0, 0.0)  # Black text
+            self.cairo_context.move_to(20, y_offset + 20)
+            layout = self.da.create_pango_layout("GTK+ 3 Cairo Drawing Active - Cylinders not yet converted")
+            layout.set_markup("<span size='12000'><b>GTK+ 3 Cairo Drawing Active</b></span>\n<span size='10000'>Cylinder graphics need Cairo conversion</span>")
+            PangoCairo.show_layout(self.cairo_context, layout)
+        else:
+            # draw message using Cairo
+            w = self.da.get_allocated_width()
+            h = self.da.get_allocated_height()
+            
+            self.cairo_context.set_source_rgb(1.0, 1.0, 1.0)  # White background
+            self.cairo_context.rectangle(0, 0, w, h)
+            self.cairo_context.fill()
+            
+            layout = self.da.create_pango_layout('')
+            layout.set_markup(self.message)
+            label_w, label_h = layout.get_pixel_size()
+            
+            self.cairo_context.set_source_rgb(0.0, 0.0, 0.0)  # Black text
+            self.cairo_context.move_to((w - label_w) // 2, (h - label_h) // 2)
+            PangoCairo.show_layout(self.cairo_context, layout)
+            
+            self.da.set_size_request(max(w, 400), max(h, 300))
     
     def render(self):
         if self.display != None:
