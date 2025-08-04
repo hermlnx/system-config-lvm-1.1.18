@@ -668,7 +668,8 @@ class MirrorSyncProgress:
                     self.vbox.pack_start(hbox)
                     self.progress_bars[name] = [hbox, progress]
             # remove completed or renamed lvs
-            for name in self.progress_bars.keys()[:]:
+            # Python 3: dict.keys() returns a view, convert to list for slicing
+            for name in list(self.progress_bars.keys()):
                 if name not in mirrors:
                     self.vbox.remove(self.progress_bars[name][0])
                     self.progress_bars.pop(name)
@@ -679,7 +680,7 @@ class MirrorSyncProgress:
                 self.progress_bars[name][1].set_fraction(mirrors[name]/100.0)
                 
             # stop timer if all done
-            if len(self.progress_bars.keys()) == 0:
+            if len(self.progress_bars) == 0:
                 self.timer = 0
                 return False
             else:

@@ -1266,14 +1266,16 @@ def get_ellipse_table(y_radius):
     
     ellipse_table = {}
     split_point = y_radius - 0.5
-    for y in range(y_radius, 0, -1):
+    # Python 3: range() requires integers, convert float to int
+    for y in range(int(y_radius), 0, -1):
         yy = y * y
-        val1 = operator.div(yy, float(y_radius * y_radius))
-        val2 = operator.sub(1.0, val1)
+        # Python 3: operator.div removed, use regular division
+        val1 = yy / float(y_radius * y_radius)
+        val2 = 1.0 - val1
         x_squared = (float(x_radius * x_radius)) * val2
-        x_offset_float = math.sqrt(operator.abs(x_squared))
+        x_offset_float = math.sqrt(abs(x_squared))
         x_offset = int(math.ceil(x_offset_float))
-        y_offset = operator.abs(y - y_radius)
+        y_offset = abs(y - y_radius)
         ellipse_table[y_offset] = x_offset
         
         
