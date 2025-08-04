@@ -597,7 +597,11 @@ class Volume_Tab_View:
           self.glade_xml.get_object('zoom_out_button').set_sensitive(False)
   
   def on_resize_drawing_area(self, obj1, obj2):
-      self.display_view.set_visible_size(self.glade_xml.get_object('viewport1').window.get_size())
+      # GTK+ 3: Use get_allocated_width/height instead of window.get_size()
+      viewport = self.glade_xml.get_object('viewport1')
+      width = viewport.get_allocated_width()
+      height = viewport.get_allocated_height()
+      self.display_view.set_visible_size((width, height))
   
 
 class MirrorSyncProgress:

@@ -166,14 +166,16 @@ class ForkedCommand:
             for fd in i:
                 if fd == self.fd_read_out:
                     s = os.read(self.fd_read_out, 1000)
-                    if s == '':
+                    if s == b'':
                         in_list.remove(self.fd_read_out)
-                    out = out + s
+                    # Python 3: decode bytes to string
+                    out = out + s.decode('utf-8', errors='replace')
                 if fd == self.fd_read_err:
                     s = os.read(self.fd_read_err, 1000)
-                    if s == '':
+                    if s == b'':
                         in_list.remove(self.fd_read_err)
-                    err = err + s
+                    # Python 3: decode bytes to string
+                    err = err + s.decode('utf-8', errors='replace')
         os.close(self.fd_read_out)
         os.close(self.fd_read_err)
         

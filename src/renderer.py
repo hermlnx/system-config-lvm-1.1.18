@@ -618,20 +618,17 @@ class DisplayView:
             self.da.set_size_request(w+20, h+y_offset+20)
             self.display.draw(self.da, self.gc, (10, y_offset))
         else:
-            # clear pixmap
-            pixmap = self.da.window
-            (w, h) = pixmap.get_size()
-            back = self.gc.foreground
-            self.gc.foreground = self.gc.background
-            pixmap.draw_rectangle(self.gc, True, 0, 0, w, h)
-            self.gc.foreground = back
+            # GTK+ 3: Use drawing area dimensions directly instead of window
+            w = self.da.get_allocated_width()
+            h = self.da.get_allocated_height()
             
-            # draw message
+            # draw message (GTK+ 3 drawing is handled differently via Cairo)
             layout = self.da.create_pango_layout('')
             layout.set_markup(self.message)
             label_w, label_h = layout.get_pixel_size()
-            #pixmap.draw_layout(self.gc, (w-label_w)/2, (h-label_h)/2, layout)
-            pixmap.draw_layout(self.gc, 180, 180, layout)
+            # Note: This drawing code needs to be rewritten for GTK+ 3 Cairo context
+            # For now, just set the size request to display the drawing area properly
+            self.da.set_size_request(max(w, 400), max(h, 300))
         
     def mouse_event(self, obj, event, *args):
         if event.type == Gdk.EventType.BUTTON_PRESS:
