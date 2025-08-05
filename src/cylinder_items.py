@@ -21,6 +21,11 @@ class Widget:
     def draw(self, dc, gc, pos):
         x, y = pos
         pass
+        
+    def draw_cairo(self, da, cairo_ctx, pos):
+        """Cairo-based drawing method for GTK+ 3"""
+        x, y = pos
+        pass
     
     def click(self, pos, leftClick): # local coordinates
         x, y = pos
@@ -123,6 +128,16 @@ class CylinderItem(Widget):
         for child in self.children:
             x = x - child.get_width()
             child.draw(dc, gc, (x, y))
+        self.children.reverse()
+        
+    def draw_cairo(self, da, cairo_ctx, pos):
+        """Cairo-based drawing method for GTK+ 3"""
+        x, y = pos
+        x = x + self.get_width()
+        self.children.reverse()
+        for child in self.children:
+            x = x - child.get_width()
+            child.draw_cairo(da, cairo_ctx, (x, y))
         self.children.reverse()
         
     def get_labels_upper(self):
@@ -261,6 +276,13 @@ class Separator(CylinderItem):
         cyl_pix = self.cyl_gen.get_pattern(self.pattern_id, dc, self.get_width(), self.height)
         dc.draw_pixbuf(gc, cyl_pix, 0, 0, x, y)
     
+    def draw_cairo(self, da, cairo_ctx, pos):
+        """Cairo-based drawing method for GTK+ 3"""
+        x, y = pos
+        if self.cyl_gen == None:
+            return
+        self.cyl_gen.draw_pattern_cairo(cairo_ctx, self.pattern_id, x, y, self.get_width(), self.height)
+    
 
 class End(CylinderItem):
     
@@ -271,6 +293,11 @@ class End(CylinderItem):
     def draw(self, dc, gc, pos):
         x, y = pos
         self.cyl_gen.draw_end(dc, gc, x, y, self.height)
+    
+    def draw_cairo(self, da, cairo_ctx, pos):
+        """Cairo-based drawing method for GTK+ 3"""
+        x, y = pos
+        self.cyl_gen.draw_end_cairo(cairo_ctx, x, y, self.height)
     
     def get_smallest_selectable_width(self):
         return 0
@@ -327,6 +354,24 @@ class Subcylinder(CylinderItem, Highlight):
         if self.selected:
             cyl_pix = self.cyl_gen.get_pattern(self.selectedPattern, dc, self.get_width(), self.height)
             dc.draw_pixbuf(gc, cyl_pix, 0, 0, x, y)
+    
+    def draw_cairo(self, da, cairo_ctx, pos):
+        """Cairo-based drawing method for GTK+ 3"""
+        x, y = pos
+        # draw children
+        CylinderItem.draw_cairo(self, da, cairo_ctx, (x, y))
+        
+        if self.cyl_gen == None:
+            return
+        # draw self
+        if self.width != 0:
+            self.cyl_gen.draw_cylinder_cairo(cairo_ctx, x, y, self.get_width(), self.height)
+        # draw highlighted pattern
+        if self.highlighted:
+            self.cyl_gen.draw_pattern_cairo(cairo_ctx, self.highlightedPattern, x, y, self.get_width(), self.height)
+        # draw selection pattern
+        if self.selected:
+            self.cyl_gen.draw_pattern_cairo(cairo_ctx, self.selectedPattern, x, y, self.get_width(), self.height)
         
     
     def click(self, pos, leftClick): # local coordinates
@@ -547,6 +592,38 @@ class SingleCylinder:
         
         # double buffering
         dc.draw_drawable(gc, pixmap, 0, 0, 0, 0, w, h)
+    
+    def draw_cairo(self, da, cairo_ctx, pos):
+        """Cairo-based drawing method for GTK+ 3"""
+        from gi.repository import PangoCairo
+        x, y = pos
+        
+        # adjust y for upper label height
+        upper_label_height = draw_cyl_labels_upper_cairo(da, cairo_ctx,
+                                                   self.cyl.get_labels_upper(),
+                                                   0, 0,
+                                                   False)[1]
+        y = y + upper_label_height
+        
+        # draw main label
+        layout = da.create_pango_layout('')
+        layout.set_markup(self.label)
+        label_w, label_h = layout.get_pixel_size()
+        cairo_ctx.move_to(x, y + (self.height-label_h)/2)
+        PangoCairo.show_layout(cairo_ctx, layout)
+        
+        # draw cylinder
+        x = x + label_w + get_ellipse_table(self.height/2)[1] + self.label_to_cyl_distance
+        self.cyl.draw_cairo(da, cairo_ctx, (x, y))
+        self.cyl_drawn_at = (x, y)
+        
+        # draw labels
+        draw_cyl_labels_upper_cairo(da, cairo_ctx,
+                                   self.cyl.get_labels_upper(), 
+                                   x, y)
+        draw_cyl_labels_lower_cairo(da, cairo_ctx,
+                                   self.cyl.get_labels_lower(), 
+                                   x, y, self.height)
         
 def draw_cyl_labels_upper(da, pixmap, gc, labels, x, y, draw=True):
         # sort
@@ -1269,9 +1346,88 @@ class CylinderGenerator:
                 dc.draw_point(gc, X, y + Y)
         
         gc.foreground = color_backup
+    
+    # Cairo-based drawing methods for GTK+ 3
+    def draw_cylinder_cairo(self, cairo_ctx, x, y, width, height):
+        """Draw a cylinder using Cairo"""
+        y_radius = height / 2
+        (ellipse_table, x_radius) = get_ellipse_table(y_radius)
         
+        # Set up gradient pattern (simplified version)
+        gradient = cairo.LinearGradient(0, y, 0, y + height)
+        gradient.add_color_stop_rgb(0, 0.8, 0.8, 1.0)  # Light blue
+        gradient.add_color_stop_rgb(1, 0.4, 0.4, 0.8)  # Darker blue
         
+        # Draw cylinder body rectangle
+        cairo_ctx.set_source(gradient)
+        cairo_ctx.rectangle(x + x_radius, y, width, height)
+        cairo_ctx.fill()
         
+        # Draw cylinder ends (ellipses)
+        cairo_ctx.save()
+        # Left end
+        cairo_ctx.translate(x + x_radius, y + y_radius)
+        cairo_ctx.scale(x_radius, y_radius)
+        cairo_ctx.arc(0, 0, 1, 0, 2 * math.pi)
+        cairo_ctx.restore()
+        cairo_ctx.set_source(gradient)
+        cairo_ctx.fill()
+        
+        cairo_ctx.save()
+        # Right end
+        cairo_ctx.translate(x + x_radius + width, y + y_radius)
+        cairo_ctx.scale(x_radius, y_radius)
+        cairo_ctx.arc(0, 0, 1, 0, 2 * math.pi)
+        cairo_ctx.restore()
+        cairo_ctx.set_source(gradient)
+        cairo_ctx.fill()
+    
+    def draw_pattern_cairo(self, cairo_ctx, pattern_id, x, y, width, height):
+        """Draw patterns using Cairo"""
+        if pattern_id == 0:
+            # Solid pattern
+            cairo_ctx.set_source_rgb(0.0, 0.0, 0.0)  # Black
+            cairo_ctx.rectangle(x, y, width, height)
+            cairo_ctx.fill()
+        elif pattern_id == 1:
+            # Horizontal stripes
+            cairo_ctx.set_source_rgb(1.0, 1.0, 1.0)  # White
+            for i in range(0, height, 2):
+                cairo_ctx.rectangle(x, y + i, width, 1)
+                cairo_ctx.fill()
+        elif pattern_id == 2:
+            # Wider horizontal stripes
+            cairo_ctx.set_source_rgb(1.0, 1.0, 1.0)  # White
+            for i in range(0, height, 5):
+                cairo_ctx.rectangle(x, y + i, width, 1)
+                cairo_ctx.fill()
+        elif pattern_id == 3:
+            # Selection pattern (highlighted)
+            cairo_ctx.set_source_rgba(1.0, 1.0, 0.0, 0.5)  # Semi-transparent yellow
+            cairo_ctx.rectangle(x, y, width, height)
+            cairo_ctx.fill()
+        elif pattern_id == 4:
+            # Very wide stripes
+            cairo_ctx.set_source_rgb(1.0, 1.0, 1.0)  # White
+            for i in range(0, height, 15):
+                cairo_ctx.rectangle(x, y + i, width, 1)
+                cairo_ctx.fill()
+    
+    def draw_end_cairo(self, cairo_ctx, x, y, height):
+        """Draw cylinder end using Cairo"""
+        y_radius = height / 2
+        x_radius = y_radius / 2
+        
+        # Set end color
+        cairo_ctx.set_source_rgb(self.end_color.red, self.end_color.green, self.end_color.blue)
+        
+        # Draw ellipse
+        cairo_ctx.save()
+        cairo_ctx.translate(x, y + y_radius)
+        cairo_ctx.scale(x_radius, y_radius)
+        cairo_ctx.arc(0, 0, 1, 0, 2 * math.pi)
+        cairo_ctx.restore()
+        cairo_ctx.fill()
         
         
 # returns (ellipse_table, x_radius)
@@ -1305,3 +1461,152 @@ def get_ellipse_table(y_radius):
     ellipses_table[y_radius] = pair
     
     return pair
+
+# Cairo-based drawing functions for GTK+ 3
+def draw_cyl_labels_upper_cairo(da, cairo_ctx, labels, x, y, draw=True):
+    """Cairo version of draw_cyl_labels_upper"""
+    # Import PangoCairo for text rendering
+    from gi.repository import PangoCairo
+    
+    # sort
+    labels_t = labels[:]
+    labels = []
+    while len(labels_t) != 0:
+        largest = labels_t[0]
+        for label in labels_t:
+            if label[1] > largest[1]:
+                largest = label
+        labels_t.remove(largest)
+        labels.append(largest)
+    
+    width_total, height_total = 0, 0 # dimensions of encompasing rectangle
+    
+    X_boundry = 1000000 # used for offset adjustment
+    offset_default = 0
+    offset = offset_default
+    length = 30
+    
+    cairo_ctx.set_source_rgb(0.0, 0.0, 0.0)  # Black lines and text
+    cairo_ctx.set_line_width(1.0)
+    
+    for label in labels:
+        layout = da.create_pango_layout('')
+        layout.set_markup(label[0])
+        label_w, label_h = layout.get_pixel_size()
+        X1 = x + label[1]
+        Y1 = y
+        X2 = X1 - int(math.cos(math.pi/4) * length)
+        Y2 = Y1 - int(math.sin(math.pi/4) * length)
+        X3 = X2
+        if X2 + label_w + 3 > X_boundry:
+            offset = offset + label_h
+        else:
+            offset = offset_default
+        Y3 = Y2 - offset - label_h / 2
+        X_boundry = X2
+        
+        if draw:
+            # Draw lines
+            cairo_ctx.move_to(X1, Y1)
+            cairo_ctx.line_to(X2, Y2)
+            cairo_ctx.line_to(X3, Y3)
+            cairo_ctx.stroke()
+            
+        X_lay = X2 + 2
+        Y_lay = Y3 - label_h/2
+        
+        if draw:
+            # Draw background rectangle for text
+            cairo_ctx.set_source_rgb(1.0, 1.0, 1.0)  # White background
+            cairo_ctx.rectangle(X_lay, Y_lay, label_w, label_h)
+            cairo_ctx.fill()
+            
+            # Draw text
+            cairo_ctx.set_source_rgb(0.0, 0.0, 0.0)  # Black text
+            cairo_ctx.move_to(X_lay, Y_lay)
+            PangoCairo.show_layout(cairo_ctx, layout)
+            
+        # calculate dimension of encompasing rectangle
+        max_w_tmp = X_lay + label_w - x
+        max_h_tmp = y - Y_lay
+        if max_w_tmp > width_total:
+            width_total= max_w_tmp
+        if max_h_tmp > height_total:
+            height_total= max_h_tmp
+        
+    return width_total, height_total
+
+def draw_cyl_labels_lower_cairo(da, cairo_ctx, labels, x, y, cyl_height, draw=True):
+    """Cairo version of draw_cyl_labels_lower"""
+    # Import PangoCairo for text rendering
+    from gi.repository import PangoCairo
+    
+    # sort
+    labels_t = labels[:]
+    labels = []
+    while len(labels_t) != 0:
+        largest = labels_t[0]
+        for label in labels_t:
+            if label[1] > largest[1]:
+                largest = label
+        labels_t.remove(largest)
+        labels.append(largest)
+    
+    width_total, height_total = 0, 0 # dimensions of encompasing rectangle
+    
+    X_boundry = 1000000 # used for offset adjustment
+    height = int(cyl_height * 5 / 8)
+    X_offset = get_ellipse_table(cyl_height/2)[0][height]
+    offset_default = cyl_height - height + 10
+    offset = offset_default
+    
+    cairo_ctx.set_source_rgb(0.0, 0.0, 0.0)  # Black lines and text
+    cairo_ctx.set_line_width(1.0)
+    
+    for label in labels:
+        layout = da.create_pango_layout('')
+        layout.set_markup(label[0])
+        label_w, label_h = layout.get_pixel_size()
+        X1 = x + label[1] + X_offset
+        Y1 = y + height
+        X2 = X1
+        Y2 = Y1 + label_h
+        X3 = X2 + label_w
+        if X3 + 3 > X_boundry:
+            offset = offset + label_h + 1
+        else:
+            offset = offset_default
+        Y2 = Y2 + offset
+        Y3 = Y2
+        X_boundry = X1
+        
+        if draw:
+            # Draw lines
+            cairo_ctx.move_to(X1, Y1)
+            cairo_ctx.line_to(X2, Y2)
+            cairo_ctx.line_to(X3, Y3)
+            cairo_ctx.stroke()
+        
+        X_lay = X2 + 2
+        Y_lay = Y2 - label_h
+        
+        if draw:
+            # Draw background rectangle for text
+            cairo_ctx.set_source_rgb(1.0, 1.0, 1.0)  # White background
+            cairo_ctx.rectangle(X_lay, Y_lay, label_w, label_h)
+            cairo_ctx.fill()
+            
+            # Draw text
+            cairo_ctx.set_source_rgb(0.0, 0.0, 0.0)  # Black text
+            cairo_ctx.move_to(X_lay, Y_lay)
+            PangoCairo.show_layout(cairo_ctx, layout)
+        
+        # calculate dimension of encompasing rectangle
+        max_w_tmp = X3 - x
+        max_h_tmp = Y3 - (cyl_height + y)
+        if max_w_tmp > width_total:
+            width_total = max_w_tmp
+        if max_h_tmp > height_total:
+            height_total = max_h_tmp
+        
+    return width_total, height_total

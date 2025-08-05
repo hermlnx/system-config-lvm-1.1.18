@@ -631,17 +631,13 @@ class DisplayView:
             if y_offset < 0:
                 y_offset = 0
             self.da.set_size_request(w+20, h+y_offset+20)
-            # For now, draw a simple placeholder to show the drawing area is working
-            self.cairo_context.set_source_rgb(0.8, 0.8, 0.8)  # Light gray background
-            self.cairo_context.rectangle(10, y_offset, w, h)
-            self.cairo_context.fill()
             
-            # Draw a simple text message indicating Cairo drawing is active
-            self.cairo_context.set_source_rgb(0.0, 0.0, 0.0)  # Black text
-            self.cairo_context.move_to(20, y_offset + 20)
-            layout = self.da.create_pango_layout("GTK+ 3 Cairo Drawing Active - Cylinders not yet converted")
-            layout.set_markup("<span size='12000'><b>GTK+ 3 Cairo Drawing Active</b></span>\n<span size='10000'>Cylinder graphics need Cairo conversion</span>")
-            PangoCairo.show_layout(self.cairo_context, layout)
+            # Clear the background
+            self.cairo_context.set_source_rgb(1.0, 1.0, 1.0)  # White background
+            self.cairo_context.paint()
+            
+            # Use Cairo drawing for the cylinder display
+            self.display.draw_cairo(self.da, self.cairo_context, (10, y_offset))
         else:
             # draw message using Cairo
             w = self.da.get_allocated_width()
