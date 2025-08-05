@@ -280,50 +280,13 @@ class Separator(CylinderItem):
         """Cairo-based drawing method for GTK+ 3"""
         x, y = pos
         if self.cyl_gen == None:
-            # Draw a curved dotted line for separators without cylinder generator
-            # Create a temporary cylinder generator with gray color for the curved boundary
-            from gi.repository import Gdk
-            gray_color = Gdk.RGBA()
-            gray_color.parse("#808080")  # Gray color
-            
-            # Create a minimal cylinder generator just for drawing the boundary
-            class TempCylGen:
-                def __init__(self, color):
-                    self.end_color = color
-                def draw_dotted_boundary_cairo(self, cairo_ctx, x, y, height, left_side=True):
-                    # Draw curved dotted line following left side of cylinder ellipse
-                    cairo_ctx.set_source_rgba(0.5, 0.5, 0.5, 0.7)
-                    
-                    # Get ellipse table for proper curvature
-                    y_radius = height / 2
-                    ellipse_table, x_radius = get_ellipse_table(y_radius)
-                    
-                    dot_length, gap_length = 3, 3
-                    current_y, drawing_dot = 0, True
-                    
-                    while current_y < height:
-                        if current_y in ellipse_table:
-                            # Follow the left edge of the elliptical cross-section
-                            x_offset = ellipse_table[current_y]
-                            boundary_x = x - x_offset
-                            
-                            if drawing_dot:
-                                for dot_y in range(current_y, min(current_y + dot_length, int(height))):
-                                    if dot_y in ellipse_table:
-                                        dot_x_offset = ellipse_table[dot_y]
-                                        dot_boundary_x = x - dot_x_offset
-                                        cairo_ctx.rectangle(dot_boundary_x, y + dot_y, 1, 1)
-                                        cairo_ctx.fill()
-                                current_y += dot_length
-                                drawing_dot = False
-                            else:
-                                current_y += gap_length
-                                drawing_dot = True
-                        else:
-                            current_y += 1
-            
-            temp_gen = TempCylGen(gray_color)
-            temp_gen.draw_dotted_boundary_cairo(cairo_ctx, x + self.get_width()//2, y, self.height)
+            # Draw simple straight vertical separator line (2D style)
+            cairo_ctx.set_source_rgba(0.3, 0.3, 0.3, 0.8)  # Dark gray line
+            cairo_ctx.set_line_width(1.0)
+            separator_x = x + self.get_width()//2
+            cairo_ctx.move_to(separator_x, y)
+            cairo_ctx.line_to(separator_x, y + self.height)
+            cairo_ctx.stroke()
             return
         self.cyl_gen.draw_pattern_cairo(cairo_ctx, self.pattern_id, x, y, self.get_width(), self.height)
     
@@ -545,7 +508,7 @@ class SingleCylinder:
     
     def minimum_pixmap_dimension(self, da):
         # cylinder dimension
-        cyl_dim = (2 * get_ellipse_table(self.height/2)[1] + self.cyl.get_width(), self.height)
+        cyl_dim = (self.cyl.get_width(), self.height)
         
         # labels dimensions
         # main
@@ -565,11 +528,11 @@ class SingleCylinder:
                                                 False)
         # width
         max_cyl_w = cyl_dim[0]
-        ellipse_w = get_ellipse_table(self.height/2)[1]
-        if upper_label_dim[0] > max_cyl_w - ellipse_w:
-            max_cyl_w = upper_label_dim[0] + ellipse_w
-        if lower_label_dim[0] > max_cyl_w - ellipse_w:
-            max_cyl_w = lower_label_dim[0] + ellipse_w
+        # For 2D bars, no ellipse width needed
+        if upper_label_dim[0] > max_cyl_w:
+            max_cyl_w = upper_label_dim[0]
+        if lower_label_dim[0] > max_cyl_w:
+            max_cyl_w = lower_label_dim[0]
         width = main_label_dim[0] + self.label_to_cyl_distance + max_cyl_w
         # height
         height = upper_label_dim[1] + cyl_dim[1] + lower_label_dim[1]
@@ -623,7 +586,7 @@ class SingleCylinder:
                            layout)
         
         # draw cylinder
-        x = x + label_w + get_ellipse_table(self.height/2)[1] + self.label_to_cyl_distance
+        x = x + label_w + self.label_to_cyl_distance
         self.cyl.draw(pixmap, gc, (x, y))
         self.cyl_drawn_at = (x, y)
         
@@ -658,7 +621,7 @@ class SingleCylinder:
         PangoCairo.show_layout(cairo_ctx, layout)
         
         # draw cylinder
-        x = x + label_w + get_ellipse_table(self.height/2)[1] + self.label_to_cyl_distance
+        x = x + label_w + self.label_to_cyl_distance
         self.cyl.draw_cairo(da, cairo_ctx, (x, y))
         self.cyl_drawn_at = (x, y)
         
@@ -947,7 +910,7 @@ class DoubleCylinder:
     
     def minimum_pixmap_dimension(self, da):
         # cylinder dimension
-        cyl_dim = (2 * get_ellipse_table(self.height/2)[1] + self.cyl_upper.get_width(), self.height)
+        cyl_dim = (self.cyl_upper.get_width(), self.height)
         
         # labels dimensions
         # main
@@ -981,15 +944,15 @@ class DoubleCylinder:
         
         # width
         max_cyl_w = cyl_dim[0]
-        ellipse_w = get_ellipse_table(self.height/2)[1]
-        if up_cyl_up_label_dim[0] > max_cyl_w - ellipse_w:
-            max_cyl_w = up_cyl_up_label_dim[0] + ellipse_w
-        if up_cyl_low_label_dim[0] > max_cyl_w - ellipse_w:
-            max_cyl_w = up_cyl_low_label_dim[0] + ellipse_w
-        if low_cyl_up_label_dim[0] > max_cyl_w - ellipse_w:
-            max_cyl_w = low_cyl_up_label_dim[0] + ellipse_w
-        if low_cyl_low_label_dim[0] > max_cyl_w - ellipse_w:
-            max_cyl_w = low_cyl_low_label_dim[0] + ellipse_w
+        # For 2D bars, no ellipse width needed
+        if up_cyl_up_label_dim[0] > max_cyl_w:
+            max_cyl_w = up_cyl_up_label_dim[0]
+        if up_cyl_low_label_dim[0] > max_cyl_w:
+            max_cyl_w = up_cyl_low_label_dim[0]
+        if low_cyl_up_label_dim[0] > max_cyl_w:
+            max_cyl_w = low_cyl_up_label_dim[0]
+        if low_cyl_low_label_dim[0] > max_cyl_w:
+            max_cyl_w = low_cyl_low_label_dim[0]
         width = main_label_dim[0] + self.label_to_cyl_distance + max_cyl_w
         # height
         distance = self.distance
@@ -1076,7 +1039,7 @@ class DoubleCylinder:
             max_label_w = label_w
         
         # draw upper cylinder
-        x = x + max_label_w + get_ellipse_table(self.height/2)[1] + self.label_to_cyl_distance
+        x = x + max_label_w + self.label_to_cyl_distance
         self.cyl_upper.draw(pixmap, gc, (x, y))
         self.cyl_upper_drawn_at = (x, y)
         # draw lower cylinder
@@ -1189,7 +1152,7 @@ class DoubleCylinder:
             max_label_w = label_w
         
         # draw upper cylinder
-        x = x + max_label_w + get_ellipse_table(self.height/2)[1] + self.label_to_cyl_distance
+        x = x + max_label_w + self.label_to_cyl_distance
         self.cyl_upper.draw_cairo(da, cairo_ctx, (x, y))
         self.cyl_upper_drawn_at = (x, y)
         
@@ -1506,148 +1469,58 @@ class CylinderGenerator:
     
     # Cairo-based drawing methods for GTK+ 3
     def draw_cylinder_body_cairo(self, cairo_ctx, x, y, width, height):
-        """Draw only the cylinder body (rectangle) without end caps"""
+        """Draw a simple 2D rectangular body segment (no 3D effects)"""
         # Use the cylinder's actual color
         base_color = self.end_color
         
-        # Set up a gradient using the cylinder's actual color
-        gradient = cairo.LinearGradient(0, y, 0, y + height)
-        # Lighter version of the base color for top
-        gradient.add_color_stop_rgb(0, 
-            min(1.0, base_color.red + 0.1), 
-            min(1.0, base_color.green + 0.1), 
-            min(1.0, base_color.blue + 0.1))
-        # Darker version of the base color for bottom  
-        gradient.add_color_stop_rgb(1, 
-            max(0.0, base_color.red - 0.1), 
-            max(0.0, base_color.green - 0.1), 
-            max(0.0, base_color.blue - 0.1))
-        
-        # Draw the rectangular body
+        # Draw the rectangular body with solid color
         cairo_ctx.set_source_rgb(base_color.red, base_color.green, base_color.blue)
         cairo_ctx.rectangle(x, y, width, height)
         cairo_ctx.fill()
         
-        # Apply gradient for 3D effect
-        cairo_ctx.set_source(gradient)
+        # Add subtle highlight on top edge for minimal depth
+        cairo_ctx.set_source_rgba(1.0, 1.0, 1.0, 0.15)  # Very subtle white highlight
+        cairo_ctx.rectangle(x, y, width, 1)
+        cairo_ctx.fill()
+        
+        # Add subtle shadow on bottom edge  
+        cairo_ctx.set_source_rgba(0.0, 0.0, 0.0, 0.15)  # Very subtle black shadow
+        cairo_ctx.rectangle(x, y + height - 1, width, 1)
+        cairo_ctx.fill()
+
+    def draw_dotted_boundary_cairo(self, cairo_ctx, x, y, height, left_side=True, cylinder_start=None):
+        """Draw a straight vertical separator line (2D style)"""
+        # Draw simple straight vertical separator line (2D style)
+        cairo_ctx.set_source_rgba(0.3, 0.3, 0.3, 0.8)  # Dark gray line
+        cairo_ctx.set_line_width(1.0)
+        cairo_ctx.move_to(x, y)
+        cairo_ctx.line_to(x, y + height)
+        cairo_ctx.stroke()
+
+    def draw_cylinder_cairo(self, cairo_ctx, x, y, width, height):
+        """Draw a simple 2D rectangular bar with gradient (no 3D effects)"""
+        # Use the cylinder's actual color
+        base_color = self.end_color
+        
+        # Draw main rectangle with solid color
+        cairo_ctx.set_source_rgb(base_color.red, base_color.green, base_color.blue)
         cairo_ctx.rectangle(x, y, width, height)
         cairo_ctx.fill()
         
-        # Add subtle 3D shading on top edge
-        cairo_ctx.set_source_rgba(1.0, 1.0, 1.0, 0.2)  # Semi-transparent white
+        # Add subtle border for definition
+        cairo_ctx.set_source_rgba(0.0, 0.0, 0.0, 0.3)  # Semi-transparent black border
+        cairo_ctx.set_line_width(1.0)
+        cairo_ctx.rectangle(x, y, width, height)
+        cairo_ctx.stroke()
+        
+        # Add subtle highlight on top edge for slight depth
+        cairo_ctx.set_source_rgba(1.0, 1.0, 1.0, 0.2)  # Semi-transparent white highlight
         cairo_ctx.rectangle(x, y, width, 2)
         cairo_ctx.fill()
         
-        # Add subtle shadow on bottom edge  
-        cairo_ctx.set_source_rgba(0.0, 0.0, 0.0, 0.1)  # Semi-transparent black
+        # Add subtle shadow on bottom edge
+        cairo_ctx.set_source_rgba(0.0, 0.0, 0.0, 0.2)  # Semi-transparent black shadow
         cairo_ctx.rectangle(x, y + height - 2, width, 2)
-        cairo_ctx.fill()
-
-    def draw_dotted_boundary_cairo(self, cairo_ctx, x, y, height, left_side=True):
-        """Draw a curved dotted line following the left side of the cylinder's elliptical cross-section"""
-        base_color = self.end_color
-        
-        # Get ellipse table for the cylinder's 3D perspective
-        y_radius = height / 2
-        ellipse_table, x_radius = get_ellipse_table(y_radius)
-        
-        # Set up dotted line style
-        cairo_ctx.set_source_rgba(
-            max(0.0, base_color.red - 0.3), 
-            max(0.0, base_color.green - 0.3), 
-            max(0.0, base_color.blue - 0.3), 
-            0.8)  # Semi-transparent darker version
-        cairo_ctx.set_line_width(1.0)
-        
-        # Draw curved dotted line following the left edge of the cylinder's ellipse
-        dot_length = 3
-        gap_length = 3
-        current_y = 0
-        drawing_dot = True
-        
-        while current_y < height:
-            if current_y in ellipse_table:
-                # Get the x_offset for this Y position from the ellipse table
-                x_offset = ellipse_table[current_y]
-                
-                # The separator follows the left edge of the elliptical cross-section
-                # x is the separator center position, x_offset is the ellipse curve
-                # The boundary follows the elliptical curve: center - x_offset for left edge
-                boundary_x = x - x_offset
-                
-                if drawing_dot:
-                    # Draw a small dot/dash at this curved position
-                    for dot_y in range(current_y, min(current_y + dot_length, int(height))):
-                        if dot_y in ellipse_table:
-                            dot_x_offset = ellipse_table[dot_y]
-                            dot_boundary_x = x - dot_x_offset
-                            cairo_ctx.rectangle(dot_boundary_x, y + dot_y, 1, 1)
-                            cairo_ctx.fill()
-                    current_y += dot_length
-                    drawing_dot = False
-                else:
-                    # Skip gap
-                    current_y += gap_length
-                    drawing_dot = True
-            else:
-                current_y += 1
-
-    def draw_cylinder_cairo(self, cairo_ctx, x, y, width, height):
-        """Draw a base cylinder shape using Cairo - to be used as background for segments"""
-        y_radius = height / 2
-        (ellipse_table, x_radius) = get_ellipse_table(y_radius)
-        
-        # Use the cylinder's actual color instead of generic gray
-        base_color = self.end_color
-        
-        # Set up a gradient using the cylinder's actual color
-        gradient = cairo.LinearGradient(0, y, 0, y + height)
-        # Lighter version of the base color for top
-        gradient.add_color_stop_rgb(0, 
-            min(1.0, base_color.red + 0.2), 
-            min(1.0, base_color.green + 0.2), 
-            min(1.0, base_color.blue + 0.2))
-        # Darker version of the base color for bottom  
-        gradient.add_color_stop_rgb(1, 
-            max(0.0, base_color.red - 0.2), 
-            max(0.0, base_color.green - 0.2), 
-            max(0.0, base_color.blue - 0.2))
-        
-        # Draw the main rectangular body first
-        cairo_ctx.set_source_rgb(base_color.red, base_color.green, base_color.blue)
-        cairo_ctx.rectangle(x + x_radius, y, width, height)
-        cairo_ctx.fill()
-        
-        # Then apply gradient for 3D effect on the body
-        cairo_ctx.set_source(gradient)
-        cairo_ctx.rectangle(x + x_radius, y, width, height)
-        cairo_ctx.fill()
-        
-        # Draw left end ellipse using the ellipse table for proper 3D perspective
-        cairo_ctx.set_source_rgb(base_color.red, base_color.green, base_color.blue)
-        for Y in range(0, int(height)):
-            if Y in ellipse_table:
-                x_offset = ellipse_table[Y]
-                # Left ellipse is centered at x + x_radius
-                cairo_ctx.rectangle(x + x_radius - x_offset, y + Y, 2 * x_offset, 1)
-                cairo_ctx.fill()
-        
-        # Draw right end ellipse 
-        for Y in range(0, int(height)):
-            if Y in ellipse_table:
-                x_offset = ellipse_table[Y] 
-                # Right ellipse is centered at x + x_radius + width
-                cairo_ctx.rectangle(x + x_radius + width - x_offset, y + Y, 2 * x_offset, 1)
-                cairo_ctx.fill()
-        
-        # Add subtle 3D shading on top edge
-        cairo_ctx.set_source_rgba(1.0, 1.0, 1.0, 0.3)  # Semi-transparent white
-        cairo_ctx.rectangle(x + x_radius, y, width, 2)
-        cairo_ctx.fill()
-        
-        # Add subtle shadow on bottom edge  
-        cairo_ctx.set_source_rgba(0.0, 0.0, 0.0, 0.2)  # Semi-transparent black
-        cairo_ctx.rectangle(x + x_radius, y + height - 2, width, 2)
         cairo_ctx.fill()
     
     def draw_pattern_cairo(self, cairo_ctx, pattern_id, x, y, width, height):
@@ -1689,18 +1562,22 @@ class CylinderGenerator:
                 cairo_ctx.fill()
     
     def draw_end_cairo(self, cairo_ctx, x, y, height):
-        """Draw cylinder end using Cairo - matching original draw_end method"""
-        ellipse_table, x_radius = get_ellipse_table(height / 2)
+        """Draw simple 2D rectangular end (no ellipse)"""
+        # For 2D style, ends are just simple rectangles with minimal width
+        end_width = 3  # Small width for end caps
         
         # Set end color
         cairo_ctx.set_source_rgb(self.end_color.red, self.end_color.green, self.end_color.blue)
         
-        # Draw ellipse by hand using ellipse table for proper 3D perspective
-        for Y in range(0, int(height)):
-            if Y in ellipse_table:
-                x_offset = ellipse_table[Y]
-                cairo_ctx.rectangle(x - x_offset, y + Y, 2 * x_offset, 1)
-                cairo_ctx.fill()
+        # Draw simple rectangle for the end
+        cairo_ctx.rectangle(x - end_width//2, y, end_width, height)
+        cairo_ctx.fill()
+        
+        # Add border for definition
+        cairo_ctx.set_source_rgba(0.0, 0.0, 0.0, 0.3)
+        cairo_ctx.set_line_width(1.0)
+        cairo_ctx.rectangle(x - end_width//2, y, end_width, height)
+        cairo_ctx.stroke()
         
         
 # returns (ellipse_table, x_radius)
