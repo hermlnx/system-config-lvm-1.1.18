@@ -42,11 +42,11 @@ PYTHON_FILES := \
 	src/Cluster.py \
 	src/system-config-lvm.py
 
-GLADE_FILES := \
-	src/lvui.glade \
-	src/migrate_extents.glade \
-	src/lv_edit_props.glade \
-	src/Filesystem.glade
+UI_FILES := \
+	src/lvui.ui \
+	src/migrate_extents.ui \
+	src/lv_edit_props.ui \
+	src/Filesystem.ui
 
 PIXMAP_FILES := \
 	src/pixmaps/UV.xpm \
@@ -91,8 +91,8 @@ install: build
 	install -m 644 $(PYTHON_FILES) $(DESTDIR)$(PKGDATADIR)/
 	install -m 755 src/system-config-lvm.py $(DESTDIR)$(PKGDATADIR)/
 	
-	# Install Glade files
-	install -m 644 $(GLADE_FILES) $(DESTDIR)$(PKGDATADIR)/
+	# Install UI files
+	install -m 644 $(UI_FILES) $(DESTDIR)$(PKGDATADIR)/
 	
 	# Install pixmaps
 	install -m 644 $(PIXMAP_FILES) $(DESTDIR)$(PKGDATADIR)/pixmaps/

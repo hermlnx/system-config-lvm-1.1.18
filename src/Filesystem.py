@@ -590,8 +590,7 @@ class gfs_clustered(Filesystem):
         gladepath = 'Filesystem.ui'
         if not os.path.exists(gladepath):
             gladepath = "%s/%s" % (INSTALLDIR, gladepath)
-        # Note: gtk.glade.bindtextdomain and gtk.glade.XML are replaced with Gtk.Builder
-        # This will need to be updated when converting glade files to UI files
+        # Note: Using Gtk.Builder for GTK+ 3 compatibility
         self.glade_xml = Gtk.Builder()
         self.glade_xml.set_translation_domain(PROGNAME)
         self.glade_xml.add_from_file(gladepath)
@@ -934,8 +933,7 @@ class gfs2_clustered(Filesystem):
         gladepath = 'Filesystem.ui'
         if not os.path.exists(gladepath):
             gladepath = "%s/%s" % (INSTALLDIR, gladepath)
-        # Note: gtk.glade.bindtextdomain and gtk.glade.XML are replaced with Gtk.Builder
-        # This will need to be updated when converting glade files to UI files
+        # Note: Using Gtk.Builder for GTK+ 3 compatibility
         self.glade_xml = Gtk.Builder()
         self.glade_xml.set_translation_domain(PROGNAME)
         self.glade_xml.add_from_file(gladepath)

@@ -1171,11 +1171,10 @@ class InputController:
 class MigrateDialog:
     
     def __init__(self, migrate, pvs, lvs):
-        gladepath = 'migrate_extents.glade'
+        gladepath = 'migrate_extents.ui'
         if not os.path.exists(gladepath):
             gladepath = "%s/%s" % (INSTALLDIR, gladepath)
-        # Note: gtk.glade.bindtextdomain and gtk.glade.XML are replaced with Gtk.Builder
-        # This will need to be updated when converting glade files to UI files
+        # Note: Using Gtk.Builder for GTK+ 3 compatibility
         self.glade_xml = Gtk.Builder()
         self.glade_xml.set_translation_domain(PROGNAME)
         self.glade_xml.add_from_file(gladepath)
@@ -1325,12 +1324,8 @@ class LV_edit_props:
         # GTK+ 3: Use UI file instead of Glade file
         gladepath = 'lv_edit_props.ui'
         if not os.path.exists(gladepath):
-            # Fallback to glade file if UI doesn't exist
-            gladepath = 'lv_edit_props.glade'
-            if not os.path.exists(gladepath):
-                gladepath = "%s/%s" % (INSTALLDIR, gladepath)
-        # Note: gtk.glade.bindtextdomain and gtk.glade.XML are replaced with Gtk.Builder
-        # This will need to be updated when converting glade files to UI files
+            gladepath = "%s/%s" % (INSTALLDIR, gladepath)
+        # Note: Using Gtk.Builder for GTK+ 3 compatibility
         self.glade_xml = Gtk.Builder()
         self.glade_xml.set_translation_domain(PROGNAME)
         self.glade_xml.add_from_file(gladepath)

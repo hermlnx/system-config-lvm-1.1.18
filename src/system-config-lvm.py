@@ -210,11 +210,10 @@ def convert_glade_to_ui(glade_content):
     return ui_content
 
 def initGlade():
-    # First try to use the complete GTK+ 3 compatible UI file, then fall back to others
+    # Try GTK+ 3 compatible UI files in order of preference
     fixed_ui_file = "lvui_fixed.ui"
     gtk3_ui_file = "lvui_gtk3.ui"
     ui_file = "lvui.ui" 
-    glade_file = "lvui.glade"
     
     # Check for complete fixed UI file first (preferred)
     if os.path.exists(fixed_ui_file):
@@ -223,24 +222,19 @@ def initGlade():
         gladepath = gtk3_ui_file
     elif os.path.exists(ui_file):
         gladepath = ui_file
-    elif os.path.exists(glade_file):
-        gladepath = glade_file
     else:
         # Try installed location
         fixed_installed = "%s/%s" % (INSTALLDIR, fixed_ui_file)
         gtk3_installed = "%s/%s" % (INSTALLDIR, gtk3_ui_file)
         ui_installed = "%s/%s" % (INSTALLDIR, ui_file)
-        glade_installed = "%s/%s" % (INSTALLDIR, glade_file)
         if os.path.exists(fixed_installed):
             gladepath = fixed_installed
         elif os.path.exists(gtk3_installed):
             gladepath = gtk3_installed
         elif os.path.exists(ui_installed):
             gladepath = ui_installed
-        elif os.path.exists(glade_installed):
-            gladepath = glade_installed
         else:
-            raise FileNotFoundError(f"No UI file found: {fixed_ui_file}, {gtk3_ui_file}, {ui_file}, or {glade_file}")
+            raise FileNotFoundError(f"No UI file found: {fixed_ui_file}, {gtk3_ui_file}, or {ui_file}")
 
     glade_xml = Gtk.Builder()
     glade_xml.set_translation_domain(PROGNAME)
@@ -258,33 +252,8 @@ def initGlade():
             print(f"Loaded Glade file: {gladepath}")
             
     except Exception as e:
-        if "Unhandled tag" in str(e) and "glade-interface" in str(e):
-            # This is an old Glade 2.0 file, try to convert it automatically
-            print(f"Detected old Glade 2.0 format in {gladepath}")
-            print("Attempting automatic conversion to GTK+ 3 UI format...")
-            
-            try:
-                import subprocess
-                ui_file_path = gladepath.replace('.glade', '.ui')
-                result = subprocess.run(['gtk-builder-convert', gladepath, ui_file_path], 
-                                      capture_output=True, text=True)
-                if result.returncode == 0 and os.path.exists(ui_file_path):
-                    print(f"Successfully converted using gtk-builder-convert: {ui_file_path}")
-                    # Try to load the converted file
-                    glade_xml.add_from_file(ui_file_path)
-                    return glade_xml
-                else:
-                    print(f"gtk-builder-convert failed: {result.stderr}")
-                    raise Exception("Automatic conversion failed")
-                    
-            except Exception as convert_error:
-                print(f"Error converting Glade file {gladepath}: {convert_error}")
-                print("Please run 'gtk-builder-convert' manually to convert .glade files to .ui format")
-                print("Example: gtk-builder-convert lvui.glade lvui.ui")
-                raise
-        else:
-            # Some other error, re-raise it
-            raise
+        print(f"Error loading UI file {gladepath}: {e}")
+        raise
     
     return glade_xml
                                                                                 
