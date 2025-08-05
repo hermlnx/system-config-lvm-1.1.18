@@ -69,6 +69,7 @@ OPTIONS:
     -v, --version       Show version information
     -d, --debug         Run with debug output
     -c, --check         Check dependencies and requirements
+    -b, --build         Build the application and exit
     --no-root-check     Skip root privilege check (use with caution)
 
 DESCRIPTION:
@@ -80,6 +81,7 @@ DESCRIPTION:
 EXAMPLES:
     $SCRIPT_NAME                    # Run normally (will prompt for sudo if needed)
     $SCRIPT_NAME --check            # Check if all requirements are met
+    $SCRIPT_NAME --build            # Build the application
     $SCRIPT_NAME --debug            # Run with debug information
     sudo $SCRIPT_NAME               # Run directly as root
 
@@ -198,10 +200,34 @@ except ImportError as e:
     fi
 }
 
+# Function to build the application
+build_application() {
+    print_info "Building application..."
+    
+    # Check if Makefile exists
+    if [[ -f "${PROJECT_ROOT}/Makefile" ]]; then
+        cd "$PROJECT_ROOT"
+        if make build >/dev/null 2>&1; then
+            print_success "Application built successfully"
+        else
+            print_warning "Make build failed, continuing anyway..."
+        fi
+    else
+        # Fallback: create symlink manually
+        cd "$SRC_DIR"
+        if [[ ! -L "system-config-lvm" ]]; then
+            ln -sf system-config-lvm.py system-config-lvm 2>/dev/null || true
+        fi
+    fi
+}
+
 # Function to run the application
 run_application() {
     local debug_mode="$1"
     local skip_root_check="$2"
+    
+    # Build the application first
+    build_application
     
     # Check if main script exists
     if [[ ! -f "$MAIN_SCRIPT" ]]; then
@@ -266,6 +292,7 @@ main() {
     local debug_mode="false"
     local skip_root_check="false"
     local check_only="false"
+    local build_only="false"
     
     # Parse command line arguments
     while [[ $# -gt 0 ]]; do
@@ -286,6 +313,10 @@ main() {
                 check_only="true"
                 shift
                 ;;
+            -b|--build)
+                build_only="true"
+                shift
+                ;;
             --no-root-check)
                 skip_root_check="true"
                 shift
@@ -300,6 +331,12 @@ main() {
     # If check-only mode, run dependency check and exit
     if [[ "$check_only" == "true" ]]; then
         check_dependencies
+        exit $?
+    fi
+    
+    # If build-only mode, build and exit
+    if [[ "$build_only" == "true" ]]; then
+        build_application
         exit $?
     fi
     
