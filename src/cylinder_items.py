@@ -1481,42 +1481,41 @@ class CylinderGenerator:
             max(0.0, base_color.green - 0.2), 
             max(0.0, base_color.blue - 0.2))
         
-        # First, draw a solid base color to ensure visibility
+        # Draw the main rectangular body first
         cairo_ctx.set_source_rgb(base_color.red, base_color.green, base_color.blue)
-        cairo_ctx.rectangle(x + x_radius, y, width - x_radius, height)
+        cairo_ctx.rectangle(x + x_radius, y, width, height)
         cairo_ctx.fill()
         
-        # Then apply gradient for 3D effect
+        # Then apply gradient for 3D effect on the body
         cairo_ctx.set_source(gradient)
-        cairo_ctx.rectangle(x + x_radius, y, width - x_radius, height)
+        cairo_ctx.rectangle(x + x_radius, y, width, height)
         cairo_ctx.fill()
         
-        # Draw rounded left end (ellipse) - solid color first
-        cairo_ctx.save()
-        cairo_ctx.translate(x + x_radius, y + y_radius)
-        cairo_ctx.scale(x_radius, y_radius)
-        cairo_ctx.arc(0, 0, 1, 0, 2 * math.pi)
-        cairo_ctx.restore()
+        # Draw left end ellipse using the ellipse table for proper 3D perspective
         cairo_ctx.set_source_rgb(base_color.red, base_color.green, base_color.blue)
-        cairo_ctx.fill()
+        for Y in range(0, int(height)):
+            if Y in ellipse_table:
+                x_offset = ellipse_table[Y]
+                # Left ellipse is centered at x + x_radius
+                cairo_ctx.rectangle(x + x_radius - x_offset, y + Y, 2 * x_offset, 1)
+                cairo_ctx.fill()
         
-        # Draw rounded right end (ellipse) - solid color first
-        cairo_ctx.save()
-        cairo_ctx.translate(x + width, y + y_radius)
-        cairo_ctx.scale(x_radius, y_radius)
-        cairo_ctx.arc(0, 0, 1, 0, 2 * math.pi)
-        cairo_ctx.restore()
-        cairo_ctx.set_source_rgb(base_color.red, base_color.green, base_color.blue)
-        cairo_ctx.fill()
+        # Draw right end ellipse 
+        for Y in range(0, int(height)):
+            if Y in ellipse_table:
+                x_offset = ellipse_table[Y] 
+                # Right ellipse is centered at x + x_radius + width
+                cairo_ctx.rectangle(x + x_radius + width - x_offset, y + Y, 2 * x_offset, 1)
+                cairo_ctx.fill()
         
         # Add subtle 3D shading on top edge
         cairo_ctx.set_source_rgba(1.0, 1.0, 1.0, 0.3)  # Semi-transparent white
-        cairo_ctx.rectangle(x + x_radius, y, width - x_radius, 2)
+        cairo_ctx.rectangle(x + x_radius, y, width, 2)
         cairo_ctx.fill()
         
         # Add subtle shadow on bottom edge  
         cairo_ctx.set_source_rgba(0.0, 0.0, 0.0, 0.2)  # Semi-transparent black
-        cairo_ctx.rectangle(x + x_radius, y + height - 2, width - x_radius, 2)
+        cairo_ctx.rectangle(x + x_radius, y + height - 2, width, 2)
         cairo_ctx.fill()
     
     def draw_pattern_cairo(self, cairo_ctx, pattern_id, x, y, width, height):
@@ -1555,20 +1554,18 @@ class CylinderGenerator:
                 cairo_ctx.fill()
     
     def draw_end_cairo(self, cairo_ctx, x, y, height):
-        """Draw cylinder end using Cairo"""
-        y_radius = height / 2
-        x_radius = y_radius / 2
+        """Draw cylinder end using Cairo - matching original draw_end method"""
+        ellipse_table, x_radius = get_ellipse_table(height / 2)
         
         # Set end color
         cairo_ctx.set_source_rgb(self.end_color.red, self.end_color.green, self.end_color.blue)
         
-        # Draw ellipse
-        cairo_ctx.save()
-        cairo_ctx.translate(x, y + y_radius)
-        cairo_ctx.scale(x_radius, y_radius)
-        cairo_ctx.arc(0, 0, 1, 0, 2 * math.pi)
-        cairo_ctx.restore()
-        cairo_ctx.fill()
+        # Draw ellipse by hand using ellipse table for proper 3D perspective
+        for Y in range(0, int(height)):
+            if Y in ellipse_table:
+                x_offset = ellipse_table[Y]
+                cairo_ctx.rectangle(x - x_offset, y + Y, 2 * x_offset, 1)
+                cairo_ctx.fill()
         
         
 # returns (ellipse_table, x_radius)
