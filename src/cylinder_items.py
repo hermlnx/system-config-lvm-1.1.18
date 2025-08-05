@@ -280,14 +280,50 @@ class Separator(CylinderItem):
         """Cairo-based drawing method for GTK+ 3"""
         x, y = pos
         if self.cyl_gen == None:
-            # Draw a simple dotted line for separators without cylinder generator
-            cairo_ctx.set_source_rgba(0.5, 0.5, 0.5, 0.7)  # Gray dotted line
-            cairo_ctx.set_line_width(1.0)
-            cairo_ctx.set_dash([2.0, 2.0])
-            cairo_ctx.move_to(x + self.get_width()//2, y)
-            cairo_ctx.line_to(x + self.get_width()//2, y + self.height)
-            cairo_ctx.stroke()
-            cairo_ctx.set_dash([])  # Reset dash pattern
+            # Draw a curved dotted line for separators without cylinder generator
+            # Create a temporary cylinder generator with gray color for the curved boundary
+            from gi.repository import Gdk
+            gray_color = Gdk.RGBA()
+            gray_color.parse("#808080")  # Gray color
+            
+            # Create a minimal cylinder generator just for drawing the boundary
+            class TempCylGen:
+                def __init__(self, color):
+                    self.end_color = color
+                def draw_dotted_boundary_cairo(self, cairo_ctx, x, y, height, left_side=True):
+                    # Draw curved dotted line following left side of cylinder ellipse
+                    cairo_ctx.set_source_rgba(0.5, 0.5, 0.5, 0.7)
+                    
+                    # Get ellipse table for proper curvature
+                    y_radius = height / 2
+                    ellipse_table, x_radius = get_ellipse_table(y_radius)
+                    
+                    dot_length, gap_length = 3, 3
+                    current_y, drawing_dot = 0, True
+                    
+                    while current_y < height:
+                        if current_y in ellipse_table:
+                            # Follow the left edge of the elliptical cross-section
+                            x_offset = ellipse_table[current_y]
+                            boundary_x = x - x_offset
+                            
+                            if drawing_dot:
+                                for dot_y in range(current_y, min(current_y + dot_length, int(height))):
+                                    if dot_y in ellipse_table:
+                                        dot_x_offset = ellipse_table[dot_y]
+                                        dot_boundary_x = x - dot_x_offset
+                                        cairo_ctx.rectangle(dot_boundary_x, y + dot_y, 1, 1)
+                                        cairo_ctx.fill()
+                                current_y += dot_length
+                                drawing_dot = False
+                            else:
+                                current_y += gap_length
+                                drawing_dot = True
+                        else:
+                            current_y += 1
+            
+            temp_gen = TempCylGen(gray_color)
+            temp_gen.draw_dotted_boundary_cairo(cairo_ctx, x + self.get_width()//2, y, self.height)
             return
         self.cyl_gen.draw_pattern_cairo(cairo_ctx, self.pattern_id, x, y, self.get_width(), self.height)
     
@@ -1508,8 +1544,12 @@ class CylinderGenerator:
         cairo_ctx.fill()
 
     def draw_dotted_boundary_cairo(self, cairo_ctx, x, y, height, left_side=True):
-        """Draw a dotted line to indicate segment boundary"""
+        """Draw a curved dotted line following the left side of the cylinder's elliptical cross-section"""
         base_color = self.end_color
+        
+        # Get ellipse table for the cylinder's 3D perspective
+        y_radius = height / 2
+        ellipse_table, x_radius = get_ellipse_table(y_radius)
         
         # Set up dotted line style
         cairo_ctx.set_source_rgba(
@@ -1518,20 +1558,39 @@ class CylinderGenerator:
             max(0.0, base_color.blue - 0.3), 
             0.8)  # Semi-transparent darker version
         cairo_ctx.set_line_width(1.0)
-        cairo_ctx.set_dash([3.0, 3.0])  # Dotted pattern
         
-        # Draw vertical line
-        if left_side:
-            cairo_ctx.move_to(x, y)
-            cairo_ctx.line_to(x, y + height)
-        else:
-            cairo_ctx.move_to(x + 1, y)  # Offset slightly to avoid overlap
-            cairo_ctx.line_to(x + 1, y + height)
+        # Draw curved dotted line following the left edge of the cylinder's ellipse
+        dot_length = 3
+        gap_length = 3
+        current_y = 0
+        drawing_dot = True
         
-        cairo_ctx.stroke()
-        
-        # Reset dash pattern
-        cairo_ctx.set_dash([])
+        while current_y < height:
+            if current_y in ellipse_table:
+                # Get the x_offset for this Y position from the ellipse table
+                x_offset = ellipse_table[current_y]
+                
+                # The separator follows the left edge of the elliptical cross-section
+                # x is the separator center position, x_offset is the ellipse curve
+                # The boundary follows the elliptical curve: center - x_offset for left edge
+                boundary_x = x - x_offset
+                
+                if drawing_dot:
+                    # Draw a small dot/dash at this curved position
+                    for dot_y in range(current_y, min(current_y + dot_length, int(height))):
+                        if dot_y in ellipse_table:
+                            dot_x_offset = ellipse_table[dot_y]
+                            dot_boundary_x = x - dot_x_offset
+                            cairo_ctx.rectangle(dot_boundary_x, y + dot_y, 1, 1)
+                            cairo_ctx.fill()
+                    current_y += dot_length
+                    drawing_dot = False
+                else:
+                    # Skip gap
+                    current_y += gap_length
+                    drawing_dot = True
+            else:
+                current_y += 1
 
     def draw_cylinder_cairo(self, cairo_ctx, x, y, width, height):
         """Draw a base cylinder shape using Cairo - to be used as background for segments"""
