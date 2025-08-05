@@ -280,6 +280,14 @@ class Separator(CylinderItem):
         """Cairo-based drawing method for GTK+ 3"""
         x, y = pos
         if self.cyl_gen == None:
+            # Draw a simple dotted line for separators without cylinder generator
+            cairo_ctx.set_source_rgba(0.5, 0.5, 0.5, 0.7)  # Gray dotted line
+            cairo_ctx.set_line_width(1.0)
+            cairo_ctx.set_dash([2.0, 2.0])
+            cairo_ctx.move_to(x + self.get_width()//2, y)
+            cairo_ctx.line_to(x + self.get_width()//2, y + self.height)
+            cairo_ctx.stroke()
+            cairo_ctx.set_dash([])  # Reset dash pattern
             return
         self.cyl_gen.draw_pattern_cairo(cairo_ctx, self.pattern_id, x, y, self.get_width(), self.height)
     
@@ -365,7 +373,8 @@ class Subcylinder(CylinderItem, Highlight):
             return
         # draw self
         if self.width != 0:
-            self.cyl_gen.draw_cylinder_cairo(cairo_ctx, x, y, self.get_width(), self.height)
+            # For subcylinders, only draw the body - elliptical ends are handled by End objects
+            self.cyl_gen.draw_cylinder_body_cairo(cairo_ctx, x, y, self.get_width(), self.height)
         # draw highlighted pattern
         if self.highlighted:
             self.cyl_gen.draw_pattern_cairo(cairo_ctx, self.highlightedPattern, x, y, self.get_width(), self.height)
@@ -1460,6 +1469,70 @@ class CylinderGenerator:
         gc.foreground = color_backup
     
     # Cairo-based drawing methods for GTK+ 3
+    def draw_cylinder_body_cairo(self, cairo_ctx, x, y, width, height):
+        """Draw only the cylinder body (rectangle) without end caps"""
+        # Use the cylinder's actual color
+        base_color = self.end_color
+        
+        # Set up a gradient using the cylinder's actual color
+        gradient = cairo.LinearGradient(0, y, 0, y + height)
+        # Lighter version of the base color for top
+        gradient.add_color_stop_rgb(0, 
+            min(1.0, base_color.red + 0.1), 
+            min(1.0, base_color.green + 0.1), 
+            min(1.0, base_color.blue + 0.1))
+        # Darker version of the base color for bottom  
+        gradient.add_color_stop_rgb(1, 
+            max(0.0, base_color.red - 0.1), 
+            max(0.0, base_color.green - 0.1), 
+            max(0.0, base_color.blue - 0.1))
+        
+        # Draw the rectangular body
+        cairo_ctx.set_source_rgb(base_color.red, base_color.green, base_color.blue)
+        cairo_ctx.rectangle(x, y, width, height)
+        cairo_ctx.fill()
+        
+        # Apply gradient for 3D effect
+        cairo_ctx.set_source(gradient)
+        cairo_ctx.rectangle(x, y, width, height)
+        cairo_ctx.fill()
+        
+        # Add subtle 3D shading on top edge
+        cairo_ctx.set_source_rgba(1.0, 1.0, 1.0, 0.2)  # Semi-transparent white
+        cairo_ctx.rectangle(x, y, width, 2)
+        cairo_ctx.fill()
+        
+        # Add subtle shadow on bottom edge  
+        cairo_ctx.set_source_rgba(0.0, 0.0, 0.0, 0.1)  # Semi-transparent black
+        cairo_ctx.rectangle(x, y + height - 2, width, 2)
+        cairo_ctx.fill()
+
+    def draw_dotted_boundary_cairo(self, cairo_ctx, x, y, height, left_side=True):
+        """Draw a dotted line to indicate segment boundary"""
+        base_color = self.end_color
+        
+        # Set up dotted line style
+        cairo_ctx.set_source_rgba(
+            max(0.0, base_color.red - 0.3), 
+            max(0.0, base_color.green - 0.3), 
+            max(0.0, base_color.blue - 0.3), 
+            0.8)  # Semi-transparent darker version
+        cairo_ctx.set_line_width(1.0)
+        cairo_ctx.set_dash([3.0, 3.0])  # Dotted pattern
+        
+        # Draw vertical line
+        if left_side:
+            cairo_ctx.move_to(x, y)
+            cairo_ctx.line_to(x, y + height)
+        else:
+            cairo_ctx.move_to(x + 1, y)  # Offset slightly to avoid overlap
+            cairo_ctx.line_to(x + 1, y + height)
+        
+        cairo_ctx.stroke()
+        
+        # Reset dash pattern
+        cairo_ctx.set_dash([])
+
     def draw_cylinder_cairo(self, cairo_ctx, x, y, width, height):
         """Draw a base cylinder shape using Cairo - to be used as background for segments"""
         y_radius = height / 2
@@ -1521,10 +1594,8 @@ class CylinderGenerator:
     def draw_pattern_cairo(self, cairo_ctx, pattern_id, x, y, width, height):
         """Draw patterns using Cairo"""
         if pattern_id == 0:
-            # Solid pattern
-            cairo_ctx.set_source_rgb(0.0, 0.0, 0.0)  # Black
-            cairo_ctx.rectangle(x, y, width, height)
-            cairo_ctx.fill()
+            # Segment boundary - draw dotted line
+            self.draw_dotted_boundary_cairo(cairo_ctx, x + width//2, y, height, left_side=True)
         elif pattern_id == 1:
             # Horizontal stripes
             cairo_ctx.set_source_rgb(1.0, 1.0, 1.0)  # White
@@ -1537,15 +1608,20 @@ class CylinderGenerator:
             cairo_ctx.rectangle(x, y, width, height)
             cairo_ctx.fill()
         elif pattern_id == 3:
-            # Selection pattern (highlighted) - more visible
-            cairo_ctx.set_source_rgba(0.2, 0.8, 1.0, 0.7)  # Semi-transparent bright blue
-            cairo_ctx.rectangle(x, y, width, height)
-            cairo_ctx.fill()
-            # Add border for better visibility
-            cairo_ctx.set_source_rgba(0.0, 0.4, 0.8, 1.0)  # Darker blue border
-            cairo_ctx.set_line_width(2.0)
-            cairo_ctx.rectangle(x, y, width, height)
-            cairo_ctx.stroke()
+            # Mirror separator or selection pattern 
+            if width <= 3:  # Narrow width suggests this is a separator
+                # Draw dotted line for mirror separator
+                self.draw_dotted_boundary_cairo(cairo_ctx, x + width//2, y, height, left_side=True)
+            else:
+                # Selection pattern (highlighted) - more visible
+                cairo_ctx.set_source_rgba(0.2, 0.8, 1.0, 0.7)  # Semi-transparent bright blue
+                cairo_ctx.rectangle(x, y, width, height)
+                cairo_ctx.fill()
+                # Add border for better visibility
+                cairo_ctx.set_source_rgba(0.0, 0.4, 0.8, 1.0)  # Darker blue border
+                cairo_ctx.set_line_width(2.0)
+                cairo_ctx.rectangle(x, y, width, height)
+                cairo_ctx.stroke()
         elif pattern_id == 4:
             # Very wide stripes
             cairo_ctx.set_source_rgb(1.0, 1.0, 1.0)  # White
