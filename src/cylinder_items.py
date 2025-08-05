@@ -1465,37 +1465,48 @@ class CylinderGenerator:
         y_radius = height / 2
         (ellipse_table, x_radius) = get_ellipse_table(y_radius)
         
-        # Create the cylinder mask/shape but don't fill it with solid color
-        # This should create the basic 3D cylinder appearance similar to the original pixbuf
+        # Use the cylinder's actual color instead of generic gray
+        base_color = self.end_color
         
-        # Set up a subtle gradient for the base cylinder
+        # Set up a gradient using the cylinder's actual color
         gradient = cairo.LinearGradient(0, y, 0, y + height)
-        gradient.add_color_stop_rgb(0, 0.9, 0.9, 0.9)  # Light gray
-        gradient.add_color_stop_rgb(1, 0.7, 0.7, 0.7)  # Darker gray
+        # Lighter version of the base color for top
+        gradient.add_color_stop_rgb(0, 
+            min(1.0, base_color.red + 0.2), 
+            min(1.0, base_color.green + 0.2), 
+            min(1.0, base_color.blue + 0.2))
+        # Darker version of the base color for bottom  
+        gradient.add_color_stop_rgb(1, 
+            max(0.0, base_color.red - 0.2), 
+            max(0.0, base_color.green - 0.2), 
+            max(0.0, base_color.blue - 0.2))
         
-        # Draw cylinder body rectangle with rounded appearance
-        cairo_ctx.set_source(gradient)
-        
-        # Draw the main rectangular body
+        # First, draw a solid base color to ensure visibility
+        cairo_ctx.set_source_rgb(base_color.red, base_color.green, base_color.blue)
         cairo_ctx.rectangle(x + x_radius, y, width - x_radius, height)
         cairo_ctx.fill()
         
-        # Draw rounded left end (ellipse)
+        # Then apply gradient for 3D effect
+        cairo_ctx.set_source(gradient)
+        cairo_ctx.rectangle(x + x_radius, y, width - x_radius, height)
+        cairo_ctx.fill()
+        
+        # Draw rounded left end (ellipse) - solid color first
         cairo_ctx.save()
         cairo_ctx.translate(x + x_radius, y + y_radius)
         cairo_ctx.scale(x_radius, y_radius)
         cairo_ctx.arc(0, 0, 1, 0, 2 * math.pi)
         cairo_ctx.restore()
-        cairo_ctx.set_source(gradient)
+        cairo_ctx.set_source_rgb(base_color.red, base_color.green, base_color.blue)
         cairo_ctx.fill()
         
-        # Draw rounded right end (ellipse)
+        # Draw rounded right end (ellipse) - solid color first
         cairo_ctx.save()
         cairo_ctx.translate(x + width, y + y_radius)
         cairo_ctx.scale(x_radius, y_radius)
         cairo_ctx.arc(0, 0, 1, 0, 2 * math.pi)
         cairo_ctx.restore()
-        cairo_ctx.set_source(gradient)
+        cairo_ctx.set_source_rgb(base_color.red, base_color.green, base_color.blue)
         cairo_ctx.fill()
         
         # Add subtle 3D shading on top edge
@@ -1522,16 +1533,20 @@ class CylinderGenerator:
                 cairo_ctx.rectangle(x, y + i, width, 1)
                 cairo_ctx.fill()
         elif pattern_id == 2:
-            # Wider horizontal stripes
-            cairo_ctx.set_source_rgb(1.0, 1.0, 1.0)  # White
-            for i in range(0, height, 5):
-                cairo_ctx.rectangle(x, y + i, width, 1)
-                cairo_ctx.fill()
-        elif pattern_id == 3:
-            # Selection pattern (highlighted)
-            cairo_ctx.set_source_rgba(1.0, 1.0, 0.0, 0.5)  # Semi-transparent yellow
+            # Highlighting pattern - subtle overlay
+            cairo_ctx.set_source_rgba(1.0, 1.0, 0.0, 0.3)  # Semi-transparent yellow
             cairo_ctx.rectangle(x, y, width, height)
             cairo_ctx.fill()
+        elif pattern_id == 3:
+            # Selection pattern (highlighted) - more visible
+            cairo_ctx.set_source_rgba(0.2, 0.8, 1.0, 0.7)  # Semi-transparent bright blue
+            cairo_ctx.rectangle(x, y, width, height)
+            cairo_ctx.fill()
+            # Add border for better visibility
+            cairo_ctx.set_source_rgba(0.0, 0.4, 0.8, 1.0)  # Darker blue border
+            cairo_ctx.set_line_width(2.0)
+            cairo_ctx.rectangle(x, y, width, height)
+            cairo_ctx.stroke()
         elif pattern_id == 4:
             # Very wide stripes
             cairo_ctx.set_source_rgb(1.0, 1.0, 1.0)  # White

@@ -217,7 +217,7 @@ class DisplayView:
                 elif extents_lv.has_snapshots():
                     cyl = UnselectableSubcylinder(_("The extents that you are attempting to select belong to a snapshot origin %s. Snapshot origins are not yet migratable, so the extents are not selectable.") % extents_lv.get_name(), self.pv_cyl_gen, 1, extent.get_start_size()[1])
                 else:
-                    cyl = Subcylinder(self.pv_cyl_gen, 1, 1, True, extent.get_start_size()[1])
+                    cyl = Subcylinder(self.pv_cyl_gen, 3, 2, True, extent.get_start_size()[1])
             else:
                 cyl = Subcylinder(self.pv_cyl_gen, 1, 1, False, extent.get_start_size()[1])
             label = "<span size=\"7000\">"
@@ -550,10 +550,10 @@ class DisplayView:
                 label = label + "</span>"
                 ext_cyl_p.set_label_lower(label, False, False, True)
                 ext_cyl_l = None
-                if lv_cyls_dir.has_key(ext) == True:
+                if ext in lv_cyls_dir:
                     ext_cyl_l = lv_cyls_dir[ext]
                     ext_cyl_l.add_highlightable(ext_cyl_p)
-                    pv_cyl.children.append(ext_cyl_p)
+                pv_cyl.children.append(ext_cyl_p)
         
         self.display.append_right(True, End(self.lv_cyl_gen))
         for lv_cyl in lv_cyls:
@@ -616,7 +616,7 @@ class DisplayView:
             self.cairo_context = cairo_context
             self.render_cairo()
         else:
-            self.render()
+            self.redraw()
         return False
     
     def redraw(self):
@@ -680,11 +680,6 @@ class DisplayView:
         
     def mouse_event(self, obj, event, *args):
         if event.type == Gdk.EventType.BUTTON_PRESS:
-            #	print 'single click'
-            #       print 'button', event.button
-            #	print 'time', event.time
-            #	print 'x', event.x
-            #	print 'y', event.y
             pass
         elif event.type == Gdk.EventType._2BUTTON_PRESS:
             #	print 'double click'
@@ -739,4 +734,5 @@ class DisplayView:
                 else:
                     self.dvH.render_multiple_selection()
             
-            self.render()
+            # Force a redraw with proper context
+            self.da.queue_draw()
