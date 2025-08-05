@@ -1092,6 +1092,118 @@ class DoubleCylinder:
                          self.cyl_lower_drawn_at[1]) #y2
         gc.line_style = back
     
+    def draw_cairo(self, da, cairo_ctx, pos):
+        """Cairo-based drawing method for GTK+ 3"""
+        from gi.repository import PangoCairo
+        x, y = pos
+        
+        # labels dimensions
+        up_cyl_up_label_dim = draw_cyl_labels_upper_cairo(da, cairo_ctx,
+                                                    self.cyl_upper.get_labels_upper(),
+                                                    0, 0,
+                                                    False)
+        up_cyl_low_label_dim = draw_cyl_labels_lower_cairo(da, cairo_ctx,
+                                                     self.cyl_upper.get_labels_lower(), 
+                                                     0, 0, 
+                                                     self.height, 
+                                                     False)
+        low_cyl_up_label_dim = draw_cyl_labels_upper_cairo(da, cairo_ctx,
+                                                     self.cyl_lower.get_labels_upper(),
+                                                     0, 0,
+                                                     False)
+        low_cyl_low_label_dim = draw_cyl_labels_lower_cairo(da, cairo_ctx,
+                                                      self.cyl_lower.get_labels_lower(), 
+                                                      0, 0, 
+                                                      self.height, 
+                                                      False)
+        
+        # calculate distance
+        distance = self.distance
+        auto_distance = up_cyl_low_label_dim[1] + self.label_to_cyl_distance + low_cyl_up_label_dim[1] 
+        if auto_distance > distance:
+            distance = auto_distance
+        
+        # adjust y for upper label height
+        y = y + up_cyl_up_label_dim[1]
+        
+        # draw upper label
+        layout = da.create_pango_layout('')
+        layout.set_markup(self.label_upper)
+        label_w, label_h = layout.get_pixel_size()
+        cairo_ctx.move_to(x, y + (self.height-label_h)/2)
+        PangoCairo.show_layout(cairo_ctx, layout)
+        max_label_w = label_w
+        
+        # draw lower label
+        layout = da.create_pango_layout('')
+        layout.set_markup(self.label_lower)
+        label_w, label_h = layout.get_pixel_size()
+        cairo_ctx.move_to(x, y + self.height + distance + (self.height - label_h)/2)
+        PangoCairo.show_layout(cairo_ctx, layout)
+        if label_w > max_label_w:
+            max_label_w = label_w
+        
+        # draw upper cylinder
+        x = x + max_label_w + get_ellipse_table(self.height/2)[1] + self.label_to_cyl_distance
+        self.cyl_upper.draw_cairo(da, cairo_ctx, (x, y))
+        self.cyl_upper_drawn_at = (x, y)
+        
+        # draw lower cylinder
+        self.cyl_lower.draw_cairo(da, cairo_ctx, (x, y + self.height + distance))
+        self.cyl_lower_drawn_at = (x, y + self.height + distance)
+        
+        # draw mapping lines (Cairo version)
+        self.draw_mappings_cairo(cairo_ctx)
+        
+        # draw cylinders' labels
+        # upper cylinder
+        draw_cyl_labels_upper_cairo(da, cairo_ctx,
+                              self.cyl_upper.get_labels_upper(), 
+                              self.cyl_upper_drawn_at[0], 
+                              self.cyl_upper_drawn_at[1])
+        draw_cyl_labels_lower_cairo(da, cairo_ctx,
+                              self.cyl_upper.get_labels_lower(), 
+                              self.cyl_upper_drawn_at[0], 
+                              self.cyl_upper_drawn_at[1],
+                              self.height)
+        # lower cylinder
+        draw_cyl_labels_upper_cairo(da, cairo_ctx, 
+                              self.cyl_lower.get_labels_upper(), 
+                              self.cyl_lower_drawn_at[0], 
+                              self.cyl_lower_drawn_at[1])
+        draw_cyl_labels_lower_cairo(da, cairo_ctx, 
+                              self.cyl_lower.get_labels_lower(), 
+                              self.cyl_lower_drawn_at[0], 
+                              self.cyl_lower_drawn_at[1], 
+                              self.height)
+    
+    def draw_mappings_cairo(self, cairo_ctx):
+        """Cairo version of draw_mappings"""
+        upper_anchors = self.cyl_upper.get_anchors()
+        lower_anchors = self.cyl_lower.get_anchors()
+        
+        # match them
+        anchors = []
+        for ancU in self.cyl_upper.get_anchors():
+            for ancL in self.cyl_lower.get_anchors():
+                if ancU[0] == ancL[0]:
+                    anchors.append((ancU[1], ancL[1]))
+                    break
+        
+        # draw lines using Cairo
+        cairo_ctx.set_source_rgb(0.0, 0.0, 0.0)  # Black lines
+        cairo_ctx.set_line_width(1.0)
+        cairo_ctx.set_dash([5.0, 5.0])  # Dashed lines
+        
+        for pair in anchors:
+            cairo_ctx.move_to(self.cyl_upper_drawn_at[0] + pair[0], 
+                             self.cyl_upper_drawn_at[1] + self.height)
+            cairo_ctx.line_to(self.cyl_lower_drawn_at[0] + pair[1], 
+                             self.cyl_lower_drawn_at[1])
+            cairo_ctx.stroke()
+        
+        # Reset dash pattern
+        cairo_ctx.set_dash([])
 
 
 
