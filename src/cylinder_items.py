@@ -1461,23 +1461,27 @@ class CylinderGenerator:
     
     # Cairo-based drawing methods for GTK+ 3
     def draw_cylinder_cairo(self, cairo_ctx, x, y, width, height):
-        """Draw a cylinder using Cairo"""
+        """Draw a base cylinder shape using Cairo - to be used as background for segments"""
         y_radius = height / 2
         (ellipse_table, x_radius) = get_ellipse_table(y_radius)
         
-        # Set up gradient pattern (simplified version)
-        gradient = cairo.LinearGradient(0, y, 0, y + height)
-        gradient.add_color_stop_rgb(0, 0.8, 0.8, 1.0)  # Light blue
-        gradient.add_color_stop_rgb(1, 0.4, 0.4, 0.8)  # Darker blue
+        # Create the cylinder mask/shape but don't fill it with solid color
+        # This should create the basic 3D cylinder appearance similar to the original pixbuf
         
-        # Draw cylinder body rectangle
+        # Set up a subtle gradient for the base cylinder
+        gradient = cairo.LinearGradient(0, y, 0, y + height)
+        gradient.add_color_stop_rgb(0, 0.9, 0.9, 0.9)  # Light gray
+        gradient.add_color_stop_rgb(1, 0.7, 0.7, 0.7)  # Darker gray
+        
+        # Draw cylinder body rectangle with rounded appearance
         cairo_ctx.set_source(gradient)
-        cairo_ctx.rectangle(x + x_radius, y, width, height)
+        
+        # Draw the main rectangular body
+        cairo_ctx.rectangle(x + x_radius, y, width - x_radius, height)
         cairo_ctx.fill()
         
-        # Draw cylinder ends (ellipses)
+        # Draw rounded left end (ellipse)
         cairo_ctx.save()
-        # Left end
         cairo_ctx.translate(x + x_radius, y + y_radius)
         cairo_ctx.scale(x_radius, y_radius)
         cairo_ctx.arc(0, 0, 1, 0, 2 * math.pi)
@@ -1485,13 +1489,23 @@ class CylinderGenerator:
         cairo_ctx.set_source(gradient)
         cairo_ctx.fill()
         
+        # Draw rounded right end (ellipse)
         cairo_ctx.save()
-        # Right end
-        cairo_ctx.translate(x + x_radius + width, y + y_radius)
+        cairo_ctx.translate(x + width, y + y_radius)
         cairo_ctx.scale(x_radius, y_radius)
         cairo_ctx.arc(0, 0, 1, 0, 2 * math.pi)
         cairo_ctx.restore()
         cairo_ctx.set_source(gradient)
+        cairo_ctx.fill()
+        
+        # Add subtle 3D shading on top edge
+        cairo_ctx.set_source_rgba(1.0, 1.0, 1.0, 0.3)  # Semi-transparent white
+        cairo_ctx.rectangle(x + x_radius, y, width - x_radius, 2)
+        cairo_ctx.fill()
+        
+        # Add subtle shadow on bottom edge  
+        cairo_ctx.set_source_rgba(0.0, 0.0, 0.0, 0.2)  # Semi-transparent black
+        cairo_ctx.rectangle(x + x_radius, y + height - 2, width - x_radius, 2)
         cairo_ctx.fill()
     
     def draw_pattern_cairo(self, cairo_ctx, pattern_id, x, y, width, height):
