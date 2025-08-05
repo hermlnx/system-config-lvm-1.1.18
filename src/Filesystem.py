@@ -754,9 +754,9 @@ class gfs_clustered(Filesystem):
         return Cluster().running()
     
     def __errorMessage(self, message):
-        dlg = Gtk.MessageDialog(None, 0,
-                                Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,
-                                message)
+        dlg = Gtk.MessageDialog(parent=None, flags=0,
+                                message_type=Gtk.MessageType.ERROR, buttons=Gtk.ButtonsType.OK,
+                                text=message)
         dlg.show_all()
         rc = dlg.run()
         dlg.destroy()
@@ -1098,9 +1098,9 @@ class gfs2_clustered(Filesystem):
         return Cluster().running()
     
     def __errorMessage(self, message):
-        dlg = Gtk.MessageDialog(None, 0,
-                                Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,
-                                message)
+        dlg = Gtk.MessageDialog(parent=None, flags=0,
+                                message_type=Gtk.MessageType.ERROR, buttons=Gtk.ButtonsType.OK,
+                                text=message)
         dlg.show_all()
         rc = dlg.run()
         dlg.destroy()

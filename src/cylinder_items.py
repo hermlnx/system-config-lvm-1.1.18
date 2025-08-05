@@ -1041,9 +1041,9 @@ class UnselectableSubcylinder(Subcylinder):
             if leftClick:
                 # left click handling
                 if self.message != None:
-                    dlg = Gtk.MessageDialog(None, 0, 
-                                            Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
-                                            self.message)
+                    dlg = Gtk.MessageDialog(parent=None, flags=0, 
+                                            message_type=Gtk.MessageType.ERROR, buttons=Gtk.ButtonsType.OK, 
+                                            text=self.message)
                     dlg.show_all()
                     rc = dlg.run()
                     dlg.destroy()

@@ -11,9 +11,9 @@ class WaitMsg:
         self.msg = message
     
     def show(self):
-        self.dlg = Gtk.MessageDialog(None, 0,
-                                     Gtk.MessageType.INFO, Gtk.ButtonsType.NONE, 
-                                     self.msg)
+        self.dlg = Gtk.MessageDialog(parent=None, flags=0,
+                                     message_type=Gtk.MessageType.INFO, buttons=Gtk.ButtonsType.NONE, 
+                                     text=self.msg)
         self.dlg.set_modal(True)
         self.dlg.show_now()
         self.displayed = True

@@ -89,9 +89,9 @@ class baselvm:
             msg = msg % PROGNAME
             should_exit = True
         if should_exit:
-            dlg = Gtk.MessageDialog(None, 0,
-                                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,
-                                    msg)
+            dlg = Gtk.MessageDialog(parent=None, flags=0,
+                                    message_type=Gtk.MessageType.ERROR, buttons=Gtk.ButtonsType.OK,
+                                    text=msg)
             dlg.run()
             sys.exit(10)
 
@@ -115,9 +115,9 @@ class baselvm:
     )
                                                                                 
   def on_about(self, *args):
-       dialog = Gtk.MessageDialog(None, 0,
-                                    Gtk.MessageType.INFO, Gtk.ButtonsType.OK,
-                                    "This software is licensed under the terms of the GPL. Copyright (c) 2004 Red Hat, Inc. All rights reserved.")
+       dialog = Gtk.MessageDialog(parent=None, flags=0,
+                                    message_type=Gtk.MessageType.INFO, buttons=Gtk.ButtonsType.OK,
+                                    text="This software is licensed under the terms of the GPL. Copyright (c) 2004 Red Hat, Inc. All rights reserved.")
        dialog.run()
        dialog.destroy()
         

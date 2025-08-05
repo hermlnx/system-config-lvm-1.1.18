@@ -1101,10 +1101,10 @@ class InputController:
   ###Convenience Dialogs
   
   def warningMessage(self, message):
-      dlg = Gtk.MessageDialog(None, 0,
-                              Gtk.MessageType.WARNING,
-                              Gtk.ButtonsType.YES_NO,
-                              message)
+      dlg = Gtk.MessageDialog(parent=None, flags=0,
+                              message_type=Gtk.MessageType.WARNING,
+                              buttons=Gtk.ButtonsType.YES_NO,
+                              text=message)
       dlg.show_all()
       rc = dlg.run()
       dlg.destroy()
@@ -1120,30 +1120,30 @@ class InputController:
           return rc
   
   def errorMessage(self, message):
-      dlg = Gtk.MessageDialog(None, 0,
-                              Gtk.MessageType.ERROR,
-                              Gtk.ButtonsType.OK,
-                              message)
+      dlg = Gtk.MessageDialog(parent=None, flags=0,
+                              message_type=Gtk.MessageType.ERROR,
+                              buttons=Gtk.ButtonsType.OK,
+                              text=message)
       dlg.show_all()
       rc = dlg.run()
       dlg.destroy()
       return rc
   
   def infoMessage(self, message):
-      dlg = Gtk.MessageDialog(None, 0,
-                              Gtk.MessageType.INFO,
-                              Gtk.ButtonsType.OK,
-                              message)
+      dlg = Gtk.MessageDialog(parent=None, flags=0,
+                              message_type=Gtk.MessageType.INFO,
+                              buttons=Gtk.ButtonsType.OK,
+                              text=message)
       dlg.show_all()
       rc = dlg.run()
       dlg.destroy()
       return rc
   
   def simpleInfoMessage(self, message):
-      dlg = Gtk.MessageDialog(None, 0,
-                              Gtk.MessageType.INFO,
-                              Gtk.ButtonsType.OK,
-                              message)
+      dlg = Gtk.MessageDialog(parent=None, flags=0,
+                              message_type=Gtk.MessageType.INFO,
+                              buttons=Gtk.ButtonsType.OK,
+                              text=message)
       dlg.show_all()
       rc = dlg.run()
       dlg.destroy()
@@ -2326,27 +2326,27 @@ class LV_edit_props:
         return ext_count
     
     def errorMessage(self, message):
-        dlg = Gtk.MessageDialog(None, 0,
-                                Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,
-                                message)
+        dlg = Gtk.MessageDialog(parent=None, flags=0,
+                                message_type=Gtk.MessageType.ERROR, buttons=Gtk.ButtonsType.OK,
+                                text=message)
         dlg.show_all()
         rc = dlg.run()
         dlg.destroy()
         return rc
     
     def infoMessage(self, message):
-        dlg = Gtk.MessageDialog(None, 0,
-                                Gtk.MessageType.INFO, Gtk.ButtonsType.OK,
-                                message)
+        dlg = Gtk.MessageDialog(parent=None, flags=0,
+                                message_type=Gtk.MessageType.INFO, buttons=Gtk.ButtonsType.OK,
+                                text=message)
         dlg.show_all()
         rc = dlg.run()
         dlg.destroy()
         return rc
     
     def questionMessage(self, message):
-        dlg = Gtk.MessageDialog(None, 0,
-                                Gtk.MessageType.INFO, Gtk.ButtonsType.YES_NO,
-                                message)
+        dlg = Gtk.MessageDialog(parent=None, flags=0,
+                                message_type=Gtk.MessageType.INFO, buttons=Gtk.ButtonsType.YES_NO,
+                                text=message)
         dlg.show_all()
         rc = dlg.run()
         dlg.destroy()
@@ -2362,9 +2362,9 @@ class LV_edit_props:
             return rc
     
     def warningMessage(self, message):
-        dlg = Gtk.MessageDialog(None, 0,
-                                Gtk.MessageType.WARNING, Gtk.ButtonsType.YES_NO,
-                                message)
+        dlg = Gtk.MessageDialog(parent=None, flags=0,
+                                message_type=Gtk.MessageType.WARNING, buttons=Gtk.ButtonsType.YES_NO,
+                                text=message)
         dlg.show_all()
         rc = dlg.run()
         dlg.destroy()
