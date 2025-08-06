@@ -44,6 +44,8 @@ PYTHON_FILES := \
 
 UI_FILES := \
 	src/lvui.ui \
+	src/lvui_fixed.ui \
+	src/lvui_gtk3.ui \
 	src/migrate_extents.ui \
 	src/lv_edit_props.ui \
 	src/Filesystem.ui

@@ -15,7 +15,7 @@ import string
 import os
 
 PROGNAME = "system-config-lvm"
-INSTALLDIR="/usr/share/system-config-lvm"
+INSTALLDIR="/usr/local/share/system-config-lvm"
 VERSION = "@VERSION@"
 
 ### gettext ("_") must come before import gtk ###
@@ -215,26 +215,26 @@ def initGlade():
     gtk3_ui_file = "lvui_gtk3.ui"
     ui_file = "lvui.ui" 
     
-    # Check for complete fixed UI file first (preferred)
-    if os.path.exists(fixed_ui_file):
+    # Try installed location first (for production use)
+    fixed_installed = "%s/%s" % (INSTALLDIR, fixed_ui_file)
+    gtk3_installed = "%s/%s" % (INSTALLDIR, gtk3_ui_file)
+    ui_installed = "%s/%s" % (INSTALLDIR, ui_file)
+    
+    if os.path.exists(fixed_installed):
+        gladepath = fixed_installed
+    elif os.path.exists(gtk3_installed):
+        gladepath = gtk3_installed
+    elif os.path.exists(ui_installed):
+        gladepath = ui_installed
+    # Fall back to current directory (for development use)
+    elif os.path.exists(fixed_ui_file):
         gladepath = fixed_ui_file
     elif os.path.exists(gtk3_ui_file):
         gladepath = gtk3_ui_file
     elif os.path.exists(ui_file):
         gladepath = ui_file
     else:
-        # Try installed location
-        fixed_installed = "%s/%s" % (INSTALLDIR, fixed_ui_file)
-        gtk3_installed = "%s/%s" % (INSTALLDIR, gtk3_ui_file)
-        ui_installed = "%s/%s" % (INSTALLDIR, ui_file)
-        if os.path.exists(fixed_installed):
-            gladepath = fixed_installed
-        elif os.path.exists(gtk3_installed):
-            gladepath = gtk3_installed
-        elif os.path.exists(ui_installed):
-            gladepath = ui_installed
-        else:
-            raise FileNotFoundError(f"No UI file found: {fixed_ui_file}, {gtk3_ui_file}, or {ui_file}")
+        raise FileNotFoundError(f"No UI file found: {fixed_ui_file}, {gtk3_ui_file}, or {ui_file}")
 
     glade_xml = Gtk.Builder()
     glade_xml.set_translation_domain(PROGNAME)
