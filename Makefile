@@ -99,8 +99,8 @@ install: build
 	# Install pixmaps
 	install -m 644 $(PIXMAP_FILES) $(DESTDIR)$(PKGDATADIR)/pixmaps/
 	
-	# Create symlink in sbin
-	ln -sf ../share/system-config-lvm/system-config-lvm.py $(DESTDIR)$(SBINDIR)/system-config-lvm
+	# Install wrapper script in sbin
+	install -m 755 system-config-lvm-wrapper.sh $(DESTDIR)$(SBINDIR)/system-config-lvm
 	
 	# Install desktop file if it exists
 	if [ -f system-config-lvm.desktop ]; then \
