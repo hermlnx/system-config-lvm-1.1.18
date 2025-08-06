@@ -10,27 +10,56 @@ system-config-lvm is a Python 3 GUI application that provides a graphical interf
 
 ## Build System & Development Commands
 
-### Build Commands
+### Current Build System (Simple Makefile)
+This project now uses a simple, functional Makefile that replaces the complex autotools build system.
+
 ```bash
-# Initial setup (requires automake-1.7 and aclocal-1.7)
-./autogen.sh
+# Build for development
+make build
 
-# Build
-make
+# Run for development (requires root)
+sudo make run
 
-# Create source RPM
-make srpm
-
-# Clean
+# Clean build artifacts and Python cache files  
 make clean
+
+# Test Python syntax
+make test
+
+# Install to system (default: /usr/local)
+sudo make install
+
+# Uninstall from system
+sudo make uninstall
+
+# Show help with all available targets
+make help
 ```
 
-### Ubuntu/Debian Package Building
+### Development vs Production Usage
+
+**Development:**
+```bash
+# Run from development directory
+cd /path/to/system-config-lvm
+sudo make run
+```
+
+**Production:**
+```bash
+# Install and run from anywhere
+sudo make install
+sudo system-config-lvm
+```
+
+### Legacy Package Building (Ubuntu/Debian)
+For distribution packaging, the old build commands are still available:
+
 ```bash
 # Build source package
 debuild -S -d -us -uc
 
-# Build with pbuilder for focal
+# Build with pbuilder for focal  
 pbuilder-dist focal build ../[filename].dsc
 
 # Build for upload
@@ -40,15 +69,6 @@ debuild -S -sd
 dput [ppa name] [filename]_source.changes
 ```
 
-### Development Tools
-```bash
-# Generate documentation
-make docs
-
-# Python code checking
-make pycheck
-```
-
 ## Architecture Overview
 
 ### Core Components
@@ -56,7 +76,7 @@ make pycheck
 **Main Application (`system-config-lvm.py`):**
 - Entry point requiring root privileges
 - Initializes GTK interface and handles LVM locking validation
-- Uses Glade XML files for UI definition
+- Uses GTK+ 3 UI files for interface definition
 
 **LVM Model Layer (`lvm_model.py`):**
 - Core data model interfacing with LVM2 commands
@@ -81,9 +101,9 @@ make pycheck
 
 **UI Components:**
 - `Volume_Tab_View.py` - Main tabbed interface
-- `Properties_Renderer.py` - Property display rendering
-- `renderer.py` - Custom GTK renderers
-- Glade files: `lvui.glade`, `lv_edit_props.glade`, `migrate_extents.glade`
+- `Properties_Renderer.py` - Property display rendering  
+- `renderer.py` - Custom GTK renderers with Cairo-based 2D visualization
+- UI files: `lvui_fixed.ui`, `lvui.ui`, `lv_edit_props.ui`, `migrate_extents.ui`, `Filesystem.ui`
 
 **Utilities:**
 - `execute.py` - Command execution with progress dialogs
@@ -101,16 +121,15 @@ make pycheck
 - Filesystem utilities (fsck, resize2fs)
 
 **Build Dependencies:**
-- autotools (automake-1.7, aclocal-1.7)
 - Python 3.6+
-- gettext for internationalization
-- intltool for translation integration
+- make (for the simple Makefile build system)
+- gettext for internationalization (optional)
 
 ## Key Design Patterns
 
 **MVC Architecture:**
 - Model: `lvm_model.py` and LVM object classes
-- View: Glade XML UI definitions and renderer classes  
+- View: GTK+ 3 UI files and renderer classes  
 - Controller: `Volume_Tab_View.py` and input controllers
 
 **Command Pattern:**
@@ -135,11 +154,12 @@ make pycheck
 - Converted `gtk.glade.XML()` to `Gtk.Builder().add_from_file()`
 - Updated all GTK constants (e.g., `gtk.MESSAGE_ERROR` → `Gtk.MessageType.ERROR`)
 - Migrated GDK usage patterns to modern equivalents
+- Converted all .glade files to .ui files
+- Simplified 3D cylinder visualization to 2D bar rendering using Cairo
+- Removed all GTK+ 2 fallback code and deprecated patterns
 
-**Known Migration Issues:**
-- Some drawing operations may need further Cairo integration
-- Glade files (.glade) should eventually be converted to UI files (.ui)
-- Some deprecated GTK+ 2 patterns may need additional refinement
+**Migration Complete:**
+All GTK+ 2 artifacts have been removed and the codebase now uses pure GTK+ 3 patterns throughout.
 
 ## Important Notes
 
