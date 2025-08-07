@@ -3,7 +3,7 @@ _ = gettext.gettext
 import os
 
 PROGNAME = "system-config-lvm"
-INSTALLDIR="/usr/share/system-config-lvm/"
+INSTALLDIR="."
 
 
 
