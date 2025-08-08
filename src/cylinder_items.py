@@ -213,7 +213,7 @@ class CylinderItem(Widget):
     
     def click(self, pos, leftClick):
         x, y = pos
-        if x > self.get_width():
+        if x < 0 or x > self.get_width():
             return None
         
         if self.selectable and leftClick and self.left_clickable:
@@ -227,7 +227,7 @@ class CylinderItem(Widget):
         offset = 0
         for child in self.children:
             child_width = child.get_width()
-            if (x > offset) and (x < offset + child_width):
+            if (x >= offset) and (x < offset + child_width):
                 return child.click((x - offset, y), leftClick)
             offset = offset + child_width
         return None
@@ -433,17 +433,16 @@ class SingleCylinder:
     
     def click(self, pos, leftClick):
         x, y = pos
-        (ellipse_table, x_radius) = get_ellipse_table(self.height/2)
         
         cyl_x = self.cyl_drawn_at[0]
         cyl_y = self.cyl_drawn_at[1]
         if not (y > cyl_y and y < cyl_y + self.height):
             return None
-        if not (x > cyl_x and x < cyl_x + self.cyl.get_width() + x_radius):
+        if not (x > cyl_x and x < cyl_x + self.cyl.get_width()):
             return None
         # click is in a rectangle, change to local coordinates
         y = y - cyl_y
-        x = x - cyl_x - ellipse_table[y]
+        x = x - cyl_x
         if x < 0:
             return None
         
@@ -805,19 +804,18 @@ class DoubleCylinder:
     
     def click(self, pos, leftClick):
         x, y = pos
-        (ellipse_table, x_radius) = get_ellipse_table(self.height/2)
         
         cyl = None
         
         cyl_x = self.cyl_upper_drawn_at[0]
         cyl_y = self.cyl_upper_drawn_at[1]
-        if x > cyl_x and x < cyl_x + self.cyl_upper.get_width() + x_radius:
+        if x > cyl_x and x < cyl_x + self.cyl_upper.get_width():
             if y > cyl_y and y < cyl_y + self.height:
                 cyl = self.cyl_upper
         if cyl == None:
             cyl_x = self.cyl_lower_drawn_at[0]
             cyl_y = self.cyl_lower_drawn_at[1]
-            if x > cyl_x and x < cyl_x + self.cyl_lower.get_width() + x_radius:
+            if x > cyl_x and x < cyl_x + self.cyl_lower.get_width():
                 if y > cyl_y and y < cyl_y + self.height:
                     cyl = self.cyl_lower
         
@@ -826,7 +824,7 @@ class DoubleCylinder:
         
         # click is in a rectangle, change to local coordinates
         y = y - cyl_y
-        x = x - cyl_x - ellipse_table[y]
+        x = x - cyl_x
         if x < 0:
             return None
         
