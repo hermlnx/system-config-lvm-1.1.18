@@ -321,8 +321,7 @@ class Volume_Tab_View:
                       NAME_COL, unalloc_string, 
                       TYPE_COL, UNSELECTABLE_TYPE)
         grouped_dir, ungrouped_list = self.__group_by_device(unalloc_list)
-        grouped_dir_sorted = grouped_dir.keys()
-        grouped_dir_sorted.sort()
+        grouped_dir_sorted = sorted(grouped_dir.keys())
         for main_dev in grouped_dir_sorted:
             dev_iter = treemodel.append(unallocated_iter)
             pvs = grouped_dir[main_dev]
@@ -360,8 +359,7 @@ class Volume_Tab_View:
                       NAME_COL, uninit_string, 
                       TYPE_COL, UNSELECTABLE_TYPE)
         grouped_dir, ungrouped_list = self.__group_by_device(uninit_list)
-        grouped_dir_sorted = grouped_dir.keys()
-        grouped_dir_sorted.sort()
+        grouped_dir_sorted = sorted(grouped_dir.keys())
         for main_dev in grouped_dir_sorted:
             dev_iter = treemodel.append(uninitialized_iter)
             pvs = grouped_dir[main_dev]
