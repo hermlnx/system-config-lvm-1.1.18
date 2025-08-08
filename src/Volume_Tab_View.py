@@ -398,21 +398,23 @@ class Volume_Tab_View:
           if len(pv.getDevnames()) == 0 or pv.wholeDevice():
               ungrouped.append(pv)
               continue
-          if pv.getDevnames()[0] in grouped.keys():
-              grouped[pv.getDevnames()[0]].append(pv)
+          devname = pv.getDevnames()[0]
+          if devname in grouped.keys():
+              grouped[devname].append(pv)
           else:
-              grouped[pv.getDevnames()[0]] = [pv]
+              grouped[devname] = [pv]
 
       # sort lists
       for main_dev in grouped:
           self.__sort_list_by_get_name_fcn(grouped[main_dev])
-      self.__sort_list_by_get_name_fcn(ungrouped)
+      ungrouped = self.__sort_list_by_get_name_fcn(ungrouped)
       return grouped, ungrouped
   
   def __sort_list_by_get_name_fcn(self, some_list):
       # Python 3: Convert dict_values to list if needed
       if hasattr(some_list, 'pop'):
-          working_list = some_list
+          # Make a copy of the list for processing
+          working_list = list(some_list)
           # Clear the original list for in-place modification
           some_list.clear()
       else:
