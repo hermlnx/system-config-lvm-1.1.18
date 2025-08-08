@@ -264,7 +264,7 @@ class Volume_Tab_View:
                           PATH_COL, vg_name, 
                           OBJ_COL, vg)
             
-            pv_list = vg.get_pvs().values()
+            pv_list = list(vg.get_pvs().values())
             grouped_dir, ungrouped_list = self.__group_by_device(pv_list)
             # Python 3: dict.keys() returns a view, convert to list and sort
             grouped_dir_sorted = sorted(grouped_dir.keys())
@@ -297,8 +297,8 @@ class Volume_Tab_View:
                               PATH_COL, pv.get_path(), 
                               OBJ_COL, pv)
             
-            lv_list = vg.get_lvs().values()
-            self.__sort_list_by_get_name_fcn(lv_list)
+            lv_list = list(vg.get_lvs().values())
+            lv_list = self.__sort_list_by_get_name_fcn(lv_list)
             for lv in lv_list:
                 if lv.is_used():
                     iter = treemodel.append(log_iter)
@@ -465,7 +465,7 @@ class Volume_Tab_View:
         self.phys_vol_view_panel.show()
         
         vg = model.get_value(iter, OBJ_COL)
-        pv_list = vg.get_pvs().values()
+        pv_list = list(vg.get_pvs().values())
         self.display_view.render_pvs(pv_list)
         self.on_best_fit(None)
         self.glade_xml.get_object('zoom_box').set_sensitive(True)
@@ -474,7 +474,7 @@ class Volume_Tab_View:
         self.clear_all_buttonpanels()
         
         vg = model.get_value(iter, OBJ_COL)
-        lv_list = vg.get_lvs().values()
+        lv_list = list(vg.get_lvs().values())
         self.show_log_vol_view_panel(lv_list)
         self.display_view.render_lvs(lv_list)
         self.on_best_fit(None)
