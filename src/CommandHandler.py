@@ -205,11 +205,10 @@ class CommandHandler:
     args.append(max_phys)
     args.append("-s")
     args.append(size_arg)
-    args.append('-c')
+    # Only add clustering option if explicitly requested (modern LVM)
+    # The -c option is deprecated in favor of --shared with lvmlockd
     if clustered:
-      args.append('y')
-    else:
-      args.append('n')
+      args.append('--shared')
     args.append(name.strip())
     args.append(pv.strip())
     cmdstr = ' '.join(args)
