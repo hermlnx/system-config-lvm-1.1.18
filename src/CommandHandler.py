@@ -336,7 +336,10 @@ class CommandHandler:
     # pv to migrate from
     pv_from = pv.strip()
     for (start, size) in extents_from:
-      pv_from = pv_from + ':' + str(start) + '-' + str(start + size - 1)
+      # Ensure start and size are integers to avoid .0 in pvmove extent specification
+      start_int = int(start)
+      size_int = int(size)
+      pv_from = pv_from + ':' + str(start_int) + '-' + str(start_int + size_int - 1)
     args.append(pv_from)
     # pv to migrate to
     if data[0] != None:
