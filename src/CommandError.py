@@ -2,8 +2,9 @@
    unsuccessfully run lvm command.
 """
 
-class CommandError:
+class CommandError(Exception):
     def __init__(self, severity, message):
+        super().__init__(message)  # Call parent Exception constructor
         self.__severity     = severity
         self.__msg          = message
     def getSeverity(self):

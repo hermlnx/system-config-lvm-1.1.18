@@ -302,8 +302,13 @@ class InputController:
             return
         max_logical_volumes = max_lvs
     
-    extent_idx = self.new_vg_extent_size.get_history()
+    extent_idx = self.new_vg_extent_size.get_active()
     phys_extent_units_meg =  self.new_vg_radio_meg.get_active()
+    
+    # Validate extent size - minimum is 8KB
+    if not phys_extent_units_meg and extent_idx < 2:  # KB mode and size < 8
+        self.errorMessage(_("Minimum extent size is 8KB. Please select 8 or higher when using kilobyte units."))
+        return
     
     clustered = self.new_vg_clustered.get_active()
     if clustered:
@@ -323,28 +328,24 @@ class InputController:
     
     self.new_vg_dlg.hide()
     
-    apply(self.reset_tree_model, [Name_request])
+    self.reset_tree_model(Name_request)
   
   def prep_new_vg_dlg(self):
       self.new_vg_name.set_text("")
       self.new_vg_max_pvs.set_text(str(MAX_PHYSICAL_VOLS))
       self.new_vg_max_lvs.set_text(str(MAX_LOGICAL_VOLS))
       self.new_vg_radio_meg.set_active(True)
-      self.new_vg_extent_size.set_history(DEFAULT_EXTENT_SIZE_MEG_IDX)
+      self.new_vg_extent_size.set_active(DEFAULT_EXTENT_SIZE_MEG_IDX)
       self.new_vg_clustered.set_active(False)
 
   def change_new_vg_radio(self, button):
-      menu = self.new_vg_extent_size.get_menu()
-      items = menu.get_children()
+      # GTK+ 3: ComboBoxText doesn't support disabling individual items,
+      # so we'll just set the appropriate default and let user choose
       #We don't want to offer the 2 and 4 options for kilo's - min size is 8k
       if self.new_vg_radio_meg.get_active() == True:
-          items[0].set_sensitive(True)
-          items[1].set_sensitive(True)
-          self.new_vg_extent_size.set_history(DEFAULT_EXTENT_SIZE_MEG_IDX)
+          self.new_vg_extent_size.set_active(DEFAULT_EXTENT_SIZE_MEG_IDX)
       else:
-          items[0].set_sensitive(False)
-          items[1].set_sensitive(False)
-          self.new_vg_extent_size.set_history(DEFAULT_EXTENT_SIZE_KILO_IDX)
+          self.new_vg_extent_size.set_active(DEFAULT_EXTENT_SIZE_KILO_IDX)
   
   def on_pv_rm(self, button):
       self.remove_pv()
@@ -486,7 +487,7 @@ class InputController:
                 return False
     
     if reset_tree == True:
-        apply(self.reset_tree_model, [vg.get_name()])
+        self.reset_tree_model(vg.get_name())
     
     return True
   
@@ -549,7 +550,7 @@ class InputController:
         return False
     
     if reset_tree:
-        apply(self.reset_tree_model, [lv.get_vg().get_name()])
+        self.reset_tree_model(lv.get_vg().get_name())
     
     return True
   
@@ -597,7 +598,7 @@ class InputController:
     
     if reset_tree_model:
         self.clear_highlighted_sections()
-        apply(self.reset_tree_model, [vg.get_name()])
+        self.reset_tree_model(vg.get_name())
   
   def on_rm_select_pvs(self, button):
       if self.section_list == None:
@@ -638,7 +639,7 @@ class InputController:
       
       if reset_tree_model:
           self.clear_highlighted_sections()
-          apply(self.reset_tree_model, [vg.get_name()])
+          self.reset_tree_model(vg.get_name())
   
   def on_new_lv(self, button):
       main_selection = self.treeview.get_selection()
@@ -658,7 +659,7 @@ class InputController:
       if dlg.run() == False:
           return
       
-      apply(self.reset_tree_model,[vg.get_name()])
+      self.reset_tree_model(vg.get_name())
   
   def on_init_entity(self, button):
       selection = self.treeview.get_selection()
@@ -666,7 +667,7 @@ class InputController:
       pv = model.get_value(iter, OBJ_COL)
       if self.initialize_entity(pv) == None:
           return
-      apply(self.reset_tree_model, ['', '', pv.get_path()])
+      self.reset_tree_model('', '', pv.get_path())
   
   def on_init_entity_from_menu(self, obj, dlg=None):
       if dlg == None:
@@ -697,7 +698,7 @@ class InputController:
               self.glade_xml.get_object("init_block_device_dlg_path").set_text(path)
               self.on_init_entity_from_menu(None, dlg)
           else:
-              apply(self.reset_tree_model, ['', '', pv.get_path()])
+              self.reset_tree_model('', '', pv.get_path())
       else:
           self.glade_xml.get_object("init_block_device_dlg_path").set_text('')
   
@@ -828,7 +829,7 @@ class InputController:
       
       args = list()
       args.append(pv.get_path())
-      apply(self.reset_tree_model, [vg.get_name()])
+      self.reset_tree_model(vg.get_name())
       
       self.add_pv_to_vg_dlg.hide()
   
@@ -916,7 +917,7 @@ class InputController:
       
       self.extend_vg_form.hide()
       if reset_tree_model:
-          apply(self.reset_tree_model, [vg.get_name()])
+          self.reset_tree_model(vg.get_name())
   
   def on_cancel_extend_vg(self, button):
       self.extend_vg_form.hide()
@@ -997,7 +998,7 @@ class InputController:
           except CommandError as e:
               self.errorMessage(e.getMessage())
               return
-          apply(self.reset_tree_model, ['', '', pv.get_path()])
+          self.reset_tree_model('', '', pv.get_path())
   
   def on_migrate_exts(self, button):
       selection = self.treeview.get_selection()
@@ -1024,7 +1025,7 @@ class InputController:
           self.command_handler.move_pv(pv.get_path(), exts_from_structs, dlg.get_data())
       except CommandError as e:
           self.errorMessage(e.getMessage())
-      apply(self.reset_tree_model, [pv.get_vg().get_name()])
+      self.reset_tree_model(pv.get_vg().get_name())
       return
   
   # removal - whether this is a migration or a removal operation
@@ -1063,7 +1064,7 @@ class InputController:
       if dlg.run() == False:
           return
       
-      apply(self.reset_tree_model, [vg.get_name()])
+      self.reset_tree_model(vg.get_name())
   
   def on_create_snapshot(self, button):
       selection = self.treeview.get_selection()
@@ -1093,7 +1094,7 @@ class InputController:
       if dlg.run() == False:
           return
       
-      apply(self.reset_tree_model, [vg.get_name()])
+      self.reset_tree_model(vg.get_name())
       
       
       
