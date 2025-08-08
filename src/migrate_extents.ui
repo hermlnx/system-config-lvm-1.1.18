@@ -18,6 +18,7 @@
     <signal name="delete_event" handler="on_window1_delete_event" last_modification_time="Fri, 27 May 2005 16:06:23 GMT"/>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox1">
+        <property name="orientation">vertical</property>
         <property name="visible">True</property>
         <property name="homogeneous">False</property>
         <property name="spacing">0</property>
@@ -58,6 +59,7 @@
         </child>
         <child>
           <object class="GtkBox" id="vbox1">
+            <property name="orientation">vertical</property>
             <property name="border_width">3</property>
             <property name="visible">True</property>
             <property name="homogeneous">False</property>
@@ -102,6 +104,7 @@ Select extents' destination and migration policy.</property>
                     <property name="right_padding">0</property>
                     <child>
                       <object class="GtkBox" id="vbox2">
+                        <property name="orientation">vertical</property>
                         <property name="border_width">3</property>
                         <property name="visible">True</property>
                         <property name="homogeneous">False</property>
@@ -126,6 +129,7 @@ Select extents' destination and migration policy.</property>
                         </child>
                         <child>
                           <object class="GtkBox" id="pv_selection_container">
+                            <property name="orientation">horizontal</property>
                             <property name="visible">True</property>
                             <property name="homogeneous">False</property>
                             <property name="spacing">3</property>
@@ -203,6 +207,7 @@ Select extents' destination and migration policy.</property>
                     <property name="right_padding">0</property>
                     <child>
                       <object class="GtkBox" id="vbox3">
+                        <property name="orientation">vertical</property>
                         <property name="visible">True</property>
                         <property name="homogeneous">False</property>
                         <property name="spacing">0</property>
@@ -312,6 +317,7 @@ Select extents' destination and migration policy.</property>
             </child>
             <child>
               <object class="GtkBox" id="lv_selection_container">
+                <property name="orientation">vertical</property>
                 <property name="border_width">3</property>
                 <property name="visible">True</property>
                 <property name="homogeneous">False</property>
