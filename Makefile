@@ -3,13 +3,13 @@
 # This replaces the complex autotools Makefile with something that works
 
 PYTHON := python3
-VERSION := 1.1.18
+VERSION := 1.1.19
 PREFIX := /usr/local
 BINDIR := $(PREFIX)/bin
 SBINDIR := $(PREFIX)/sbin
 DATADIR := $(PREFIX)/share
 PKGDATADIR := $(DATADIR)/system-config-lvm
-APPLICATIONSDIR := $(DATADIR)/applications
+APPLICATIONSDIR := /usr/share/applications
 
 # Source files
 PYTHON_FILES := \
@@ -64,7 +64,7 @@ PIXMAP_FILES := \
 all: build
 
 # Build target - create symlink for development
-build:
+build: desktop
 	@echo "Building system-config-lvm..."
 	cd src && rm -f system-config-lvm && ln -s system-config-lvm.py system-config-lvm
 	@echo "Build complete. Use 'make run' to test or 'make install' to install."
@@ -150,7 +150,7 @@ pycheck:
 desktop:
 	@echo "Creating desktop file..."
 	@if [ -f system-config-lvm.desktop.in ]; then \
-		sed 's/@VERSION@/$(VERSION)/g' system-config-lvm.desktop.in > system-config-lvm.desktop; \
+		sed -e 's:INSTALLDIR:$(PREFIX):g' system-config-lvm.desktop.in > system-config-lvm.desktop; \
 		echo "Desktop file created: system-config-lvm.desktop"; \
 	else \
 		echo "Warning: system-config-lvm.desktop.in not found"; \

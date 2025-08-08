@@ -1,11 +1,12 @@
 [Desktop Entry]
-_Name=Logical Volume Management
-_GenericName=system-config-lvm
-_Comment=Configure LVM in a graphical setting
+Name=Logical Volume Management
+GenericName=system-config-lvm
+Comment=Configure LVM in a graphical setting
+Path=INSTALLDIR/share/system-config-lvm
 StartupNotify=true
-Icon=/usr/share/system-config-lvm/pixmaps/lv_icon.png
-Exec=/usr/bin/system-config-lvm
+Icon=INSTALLDIR/share/system-config-lvm/pixmaps/lv_icon.png
+Exec=sudo INSTALLDIR/sbin/system-config-lvm
 Type=Application
-Terminal=false
+Terminal=true
 Categories=System
 Keywords=disk;harddrive;partitioning;
